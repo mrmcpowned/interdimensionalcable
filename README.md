@@ -1,1 +1,2 @@
-# interdimensionalcable.github.io
+# Inter-Dimensional Cable
+http://inter-dimensionalcable.xyz
