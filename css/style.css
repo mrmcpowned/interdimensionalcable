@@ -1,0 +1,57 @@
+
+.container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.cover {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 3;
+}
+
+.rick-bg {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 2;
+}
+
+body {
+    overflow: hidden;
+    background: rgb(181, 213, 179);
+}
+
+#video{
+    width: 37.1%;
+    top: 25.2%;
+    position: absolute;
+    left: calc(52.2%);
+    transform: translateX(-50.1%);
+    z-index: 0;
+}
+
+#video div{
+    position: relative;
+    padding-bottom:56.25%;
+	padding-top:0;
+	height:0;
+	overflow:hidden;
+    
+}
+#video iframe, #video object, #video embed{
+    position: absolute;
+	top:0;
+	left:0;
+    width:100%;
+	height:100%;
+}
+
+.remote{
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 5;
+}

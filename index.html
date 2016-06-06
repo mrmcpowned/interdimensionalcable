@@ -1,1 +1,37 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inter-Dimensional Cable</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="js/get-video.js"></script>
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.2/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="remote">
+        
+    </div>
+    <div class="container">
+        <div class="cover"></div>
+<!--        <img src="images/Rick-morty-tv.png" alt="Rick and Morty TV Background" class="rick-bg">-->
+       <video src="video/rick-tv.webm" class="rick-bg" id="rick-bg" preload>
+       </video>
+        <div id="video">
+            <div id="yt-contain">
+                <div id="yt-iframe"></div>
+<!--                <iframe src="https://www.youtube.com/embed/HsPn2syqLtY" frameborder="0" allowfullscreen></iframe>-->
+            </div>
+            
+        </div>
+    </div>
+    <div class="remote">
+        <button onclick="triggerAnimation(turnOnOffTV)">Turn On Tv</button>
+        <button onclick="triggerAnimation(nextChannel)">Next Channel</button>
+        <button onclick="triggerAnimation(volumeUp)">Volume Up</button>
+        <button onclick="triggerAnimation(volumeDown)">Volume Down</button>
+    </div>
+    <script src="https://www.youtube.com/iframe_api" async></script>
+
+</body>
+</html>
