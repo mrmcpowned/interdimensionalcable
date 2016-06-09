@@ -58,9 +58,13 @@ html[data-useragent*=Firefox] #video{
     top: 0;
     transform: scale(1.05);
     background: url(../images/tv-cover.png) center;
-    background-size: cover;
     pointer-events: none;
     transition: .3s ease-out;
+}
+
+html[data-useragent*=Firefox] #video:after{
+    background: url(../images/tv-cover.png) center;
+    background-size: cover;
 }
 
 .container.zoom #video{
