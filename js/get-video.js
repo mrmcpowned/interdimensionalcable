@@ -1,6 +1,8 @@
 var videoObj = {};
 var videoInfo = {};
 var videoList = [];
+var redditData = {};
+var channelNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "101", "C137", "666", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 var tvState = 0;
 var muteState = 0;
 var menuState = 0;
@@ -42,7 +44,7 @@ function triggerAnimation(callback) {
         animationState = 1;
         setTimeout(function () {
             animationState = 0;
-        }, animationDelay)
+        }, animationDelay);
         bgv.play();
         delay = (bgv.duration * 1000) - 800;
         clearTimeout(actionDelay);
@@ -58,7 +60,7 @@ function turnOnOffTV() {
         videoList = shuffle(videoList);
         currentVideo = videoList[0];
         currentVideoID = 0;
-
+        $('.container').toggleClass('tv-on');
         player = new YT.Player('yt-iframe', {
             width: 1280,
             height: 720,
@@ -77,11 +79,20 @@ function turnOnOffTV() {
                 'onError': onPlayerError
             }
         });
-        
+        if (muteState) {
+            player.mute();
+        }
+        changeChannelName();
+        $('#yt-contain').addClass("reset")
+        setTimeout(function () {
+            $('#yt-contain').removeClass("reset");
+        }, 200);
+
     } else if (tvState) {
         clearTimeout(autoChannelDelay);
-        if (menuState){
-            console.log('tv menu reset')
+        $('.container').toggleClass('tv-on');
+        if (menuState) {
+            console.log('tv menu reset');
             menuToggle();
         }
         player.destroy();
@@ -100,7 +111,7 @@ function turnOnOffTV() {
 function onPlayerError() {
     console.error('Error Loading Video, Changing channel in 2 seconds')
     setTimeout(function () {
-        triggerAnimation(nextChannel)
+        triggerAnimation(nextChannel);
     }, 2000);
 }
 
@@ -114,9 +125,10 @@ function onPlayerStateChange(event) {
         clearTimeout(autoChannelDelay);
         var acdMS = player.getDuration() * 1000 - delay - 300;
         autoChannelDelay = setTimeout(function () {
+            console.log("Channel auto-changed!");
             triggerAnimation(nextChannel);
         }, acdMS);
-        console.log("Timeout Set on state change!")
+        console.log("Timeout Set on state change!");
         channelDelayState = 1;
     }
     if (event.data == 2) {
@@ -131,7 +143,7 @@ function onPlayerStateChange(event) {
 function nextChannel() {
     if (tvState) {
         clearTimeout(autoChannelDelay);
-        console.log("Timeout Removed on channel change!")
+        console.log("Timeout Removed on channel change!");
         currentVideoID++;
         currentVideo = videoList[currentVideoID];
         player.loadVideoById(currentVideo);
@@ -144,6 +156,11 @@ function nextChannel() {
             console.log("Video list refreshed!");
         }
         console.log("Channel Changed!");
+        changeChannelName();
+        $('#yt-contain').addClass("reset")
+        setTimeout(function () {
+            $('#yt-contain').removeClass("reset");
+        }, 200);
         channelDelayState = 0;
     }
 }
@@ -166,7 +183,7 @@ function volumeDown() {
     if (tvState) {
         if (tvAudioLevel !== 0) {
             tvAudioLevel -= 10;
-        } else if (tvAudioLevel == 0) {
+        } else if (tvAudioLevel === 0) {
             mute();
         }
         player.setVolume(tvAudioLevel);
@@ -191,8 +208,8 @@ function zoomToggle() {
 }
 
 function menuToggle() {
-    if (tvState){
-        if(!menuState){
+    if (tvState) {
+        if (!menuState) {
             menuState = 1;
         } else {
             menuState = 0;
@@ -201,10 +218,25 @@ function menuToggle() {
     }
 }
 
+function openVideo() {
+    if (tvState) {
+        window.open(player.getVideoUrl(), '_blank');
+    }
+}
+
+function changeChannelName() {
+    var channelName = channelNames[Math.floor(Math.random() * channelNames.length)];
+    $("[data-channel-id]").attr("data-channel-id", channelName);
+}
+
 function sortVideoData() {
     //    var tcode = new RegExp(/(?:(?:http|https):\/\/(?:youtu\.be|youtube\.com|.*\.youtube\.com)\/)(?:.*?)(\?t|&t)/);
     var tcode = new RegExp(/((?:\?|;|&)t=)/);
     //    var videoIdReg = new RegExp(/(?:(?:http|https):\/\/(?:youtu\.be|youtube\.com|.*\.youtube\.com)\/)(?:watch\?v=(.*?)&|watch\?v=(.*)|(.*)\?|(.*))/);
+    /**
+    Ok, so like, my RegEx sucks. Here I've basically tried to gather the video ID properly from all these URLs.
+    With the regex ontop, I'm finding URLs wit ha timestamp so I can later ignore then in the loop below. I know this can most likely be done with RegEx itself, but since I'm looping through
+    */
     var videoIdReg = new RegExp(/(?:(?:http|https):\/\/(?:youtu\.be|youtube\.com|.*\.youtube\.com)\/)(?:watch\?(?:.*?)v=(.*?)&|watch\?(?:.*?)v=(.*)|watch\?v=(.*?)&|watch\?v=(.*)|(.*)\?|(.*))/);
     for (var i = 0; i < videoObj.data.children.length; i++) {
         var submittedUrl = videoObj.data.children[i].data.url;
@@ -245,4 +277,9 @@ function getVideos() {
 $(function () {
     bgv = document.getElementById("rick-bg");
     getVideos();
-})
+    $.ajax({
+        url: "https://www.reddit.com/api/me.json"
+    }).done(function (data) {
+        redditData = data;
+    });
+});
