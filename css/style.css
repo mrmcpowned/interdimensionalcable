@@ -3,13 +3,12 @@
     width: 100%;
     height: 100%;
     position: relative;
+    transition: .3s ease-out;
+    transform-origin: 53.9% 39.3%;
 }
 
-.cover {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    z-index: 3;
+.container.zoom{
+    transform: scale(1.811624);
 }
 
 .rick-bg {
@@ -17,6 +16,7 @@
     height: auto;
     position: relative;
     z-index: 2;
+    pointer-events: none
 }
 
 body {
@@ -24,24 +24,71 @@ body {
     background: rgb(181, 213, 179);
 }
 
-#video{
-    width: 37.1%;
-    top: 25.2%;
-    position: absolute;
-    left: calc(52.2%);
-    transform: translateX(-50.1%);
-    z-index: 0;
+html[data-useragent*=Firefox] #video{
+    z-index: 2;
 }
 
-#video div{
+#video{
+    width: 36.8%;
+    top: 25.2%;
+    position: absolute;
+    left: calc(52.25%);
+    transform: translateX(-50.1%);
+    z-index: 1;
+}
+
+#video:before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: black;
+    top: 0;
+    z-index: -1;
+    transform: scale(1.05);
+}
+
+#video::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    transform: scale(1.05);
+    background: url(../images/tv-cover.png) center;
+    background-size: cover;
+    pointer-events: none;
+    transition: .3s ease-out;
+}
+
+.container.zoom #video{
+    width: 66.667%;
+    top: 10.5%;
+    transform: translateX(-50.1%) scale(.55199092085);
+}
+
+.responsive, #yt-contain{
     position: relative;
     padding-bottom:56.25%;
 	padding-top:0;
 	height:0;
 	overflow:hidden;
-    
+    top: 0;
 }
-#video iframe, #video object, #video embed{
+
+#yt-contain{
+    transform-origin: 5% 11%;
+    transform: scale(1);
+    transition: .4s ease-out;
+}
+
+.menu-overlay #yt-contain {
+    transform: scale(.4);
+}
+
+#video iframe, #video object, #video embed, .responsive iframe, .responsive object, .responsive embed{
     position: absolute;
 	top:0;
 	left:0;
@@ -49,9 +96,39 @@ body {
 	height:100%;
 }
 
+
 .remote{
     position: fixed;
     bottom: 10px;
     left: 10px;
     z-index: 5;
+}
+
+.info-bar {
+    position: absolute;
+    display: none;
+    flex-direction: row;
+    height: 110px;
+    width: 100%;
+    background: rgba(0,100,200,.6);
+    z-index: 1;
+    box-sizing: border-box;
+    padding: 2px 20px;
+    top: 2px;
+}
+
+.info-bar .description{
+    flex-grow: 1;
+}
+
+.image-container{
+    position: relative;
+    width: 140px;
+    margin-right: 10px;
+    margin-top: 14px;
+}
+.image-container .responsive{
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }

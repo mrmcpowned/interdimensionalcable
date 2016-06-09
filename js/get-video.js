@@ -3,15 +3,16 @@ var videoInfo = {};
 var videoList = [];
 var tvState = 0;
 var muteState = 0;
-var actionState = 0;
+var menuState = 0;
+var animationState = 0;
 var tvAudioLevel = 50;
+var channelDelayState = 0;
 var currentVideo;
 var currentVideoID;
 var player;
 var bgv;
 var delay;
 var autoChannelDelay;
-var channelDelayState = 0;
 
 //Fisher-Yates shuffle from Mike Bostock's blog
 function shuffle(array) {
@@ -36,11 +37,12 @@ function shuffle(array) {
 
 function triggerAnimation(callback) {
     var actionDelay;
-    if (!actionState) {
-        actionState = 1;
+    var animationDelay = bgv.duration * 1000;
+    if (!animationState) {
+        animationState = 1;
         setTimeout(function () {
-            actionState = 0;
-        }, 1000)
+            animationState = 0;
+        }, animationDelay)
         bgv.play();
         delay = (bgv.duration * 1000) - 800;
         clearTimeout(actionDelay);
@@ -53,8 +55,7 @@ function triggerAnimation(callback) {
 function turnOnOffTV() {
     if (!tvState) {
         tvState = 1;
-        actionState = 1;
-
+        videoList = shuffle(videoList);
         currentVideo = videoList[0];
         currentVideoID = 0;
 
@@ -68,7 +69,7 @@ function turnOnOffTV() {
                 'showinfo': 0,
                 'rel': 0,
                 'iv_load_policy': 3,
-                
+                'disablekb': 1
             },
             events: {
                 'onReady': onPlayerReady,
@@ -76,14 +77,31 @@ function turnOnOffTV() {
                 'onError': onPlayerError
             }
         });
-        actionState = 0;
-    } else {
         
+    } else if (tvState) {
+        clearTimeout(autoChannelDelay);
+        if (menuState){
+            console.log('tv menu reset')
+            menuToggle();
+        }
+        player.destroy();
+        channelDelayState = 0;
+        tvState = 0;
     }
 }
 
-function onPlayerError(){
-    triggerAnimation(nextChannel);
+
+//Decided against doing this to keep the gag as genuine as possible. The beauty lies in nto knowing what's going on until it's too late
+//function populateVideoInfo() {
+//    $('.info-bar .responsive').css({"background-image": "url(http://img.youtube.com/vi/" + player.getVideoData().video_id + "/1.jpg)"});
+//    $('.description p').text(player.getVideoData().title);
+//}
+
+function onPlayerError() {
+    console.error('Error Loading Video, Changing channel in 2 seconds')
+    setTimeout(function () {
+        triggerAnimation(nextChannel)
+    }, 2000);
 }
 
 function onPlayerReady(event) {
@@ -101,13 +119,19 @@ function onPlayerStateChange(event) {
         console.log("Timeout Set on state change!")
         channelDelayState = 1;
     }
+    if (event.data == 2) {
+        event.target.playVideo();
+    }
+    if (event.data == 0) {
+        nextChannel();
+    }
     event.target.setVolume(tvAudioLevel);
 }
 
 function nextChannel() {
-    if (tvState && !actionState) {
+    if (tvState) {
+        clearTimeout(autoChannelDelay);
         console.log("Timeout Removed on channel change!")
-        actionState = 1;
         currentVideoID++;
         currentVideo = videoList[currentVideoID];
         player.loadVideoById(currentVideo);
@@ -120,40 +144,60 @@ function nextChannel() {
             console.log("Video list refreshed!");
         }
         console.log("Channel Changed!");
-        actionState = 0;
         channelDelayState = 0;
     }
 }
 
 function volumeUp(direction) {
-    if (tvState && !actionState) {
-        actionState = 1;
+    if (tvState) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
         }
+        if (muteState) {
+            console.log('Un Muted Audio on Volume Raise!')
+            mute();
+        }
         player.setVolume(tvAudioLevel);
         console.log("Volume Raised!");
-        actionState = 0;
     }
 }
 
 function volumeDown() {
-    if (tvState && !actionState) {
-        actionState = 1;
+    if (tvState) {
         if (tvAudioLevel !== 0) {
             tvAudioLevel -= 10;
+        } else if (tvAudioLevel == 0) {
+            mute();
         }
         player.setVolume(tvAudioLevel);
         console.log("Volume Lowered!");
-        actionState = 0;
     }
 }
 
 function mute() {
-    if (tvState && !actionState) {
+    if (tvState) {
         if (!muteState) {
-
+            player.mute();
+            muteState = 1;
+        } else {
+            player.unMute();
+            muteState = 0;
         }
+    }
+}
+
+function zoomToggle() {
+    $('.container').toggleClass('zoom');
+}
+
+function menuToggle() {
+    if (tvState){
+        if(!menuState){
+            menuState = 1;
+        } else {
+            menuState = 0;
+        }
+        $('.container').toggleClass('menu-overlay');
     }
 }
 
@@ -196,11 +240,6 @@ function getVideos() {
             videoObj = data;
             sortVideoData();
         });
-}
-
-function onPlayerReady(event) {
-    event.target.setVolume(100);
-    event.target.playVideo();
 }
 
 $(function () {

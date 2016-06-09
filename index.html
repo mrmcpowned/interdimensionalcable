@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<!--
+TODO: Add a zoom-in functionality
+TODO: Aniamtion for Channel number on change
+TODO: Info Button
+TODO: Make proper remote
+TODO: Upvote on reddit using up button? 
+-->
+
 <head>
     <meta charset="UTF-8">
     <title>Inter-Dimensional Cable</title>
@@ -8,30 +17,46 @@
     <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.2/normalize.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="remote">
-        
-    </div>
-    <div class="container">
-        <div class="cover"></div>
-<!--        <img src="images/Rick-morty-tv.png" alt="Rick and Morty TV Background" class="rick-bg">-->
-       <video src="video/rick-tv.webm" class="rick-bg" id="rick-bg" preload>
-       </video>
-        <div id="video">
-            <div id="yt-contain">
-                <div id="yt-iframe"></div>
-<!--                <iframe src="https://www.youtube.com/embed/HsPn2syqLtY" frameborder="0" allowfullscreen></iframe>-->
-            </div>
-            
-        </div>
-    </div>
-    <div class="remote">
-        <button onclick="triggerAnimation(turnOnOffTV)">Turn On Tv</button>
+        <button onclick="triggerAnimation(turnOnOffTV)">Turn On/Off Tv</button>
+        <button onclick="triggerAnimation(zoomToggle)">Zoom In/Out</button>
         <button onclick="triggerAnimation(nextChannel)">Next Channel</button>
         <button onclick="triggerAnimation(volumeUp)">Volume Up</button>
         <button onclick="triggerAnimation(volumeDown)">Volume Down</button>
+        <button onclick="triggerAnimation(mute)">Mute</button>
+        <button onclick="triggerAnimation(menuToggle)">Menu</button>
+    </div>
+    <div class="container">
+        <!--        <img src="images/Rick-morty-tv.png" alt="Rick and Morty TV Background" class="rick-bg">-->
+        <video src="video/rick-tv.webm" class="rick-bg" id="rick-bg" preload>
+        </video>
+        <div id="video">
+            <div class="info-bar">
+                <div class="image-container">
+                    <div class="responsive">
+                    </div>
+                </div>
+                <div class="description">
+                    <p></p>
+                </div>
+            </div>
+            <div id="yt-contain">
+                <div id="yt-iframe"></div>
+            </div>
+
+        </div>
     </div>
     <script src="https://www.youtube.com/iframe_api" async></script>
+    <script>
+        //CSS USer Agent Selectors from http://rog.ie/blog/html5-boilerplate-addon
+        var b = document.documentElement;
+          b.setAttribute('data-useragent',  navigator.userAgent);
+          b.setAttribute('data-platform', navigator.platform );
+          b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window))?' touch':'');
+    </script>
 
 </body>
+
 </html>
