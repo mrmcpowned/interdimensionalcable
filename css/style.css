@@ -57,7 +57,6 @@ html[data-useragent*=Firefox] #video{
     position: absolute;
     top: 0;
     transform: scale(1.05);
-    background: url(../images/tv-cover.png) center;
     pointer-events: none;
     transition: .3s ease-out;
 }
