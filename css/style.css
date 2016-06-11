@@ -17,8 +17,66 @@
         opacity: 0;
     }
 }
+@keyframes tvoff {
+    0% {
+        background: white;
+    }
+    20% {
+        transform: scaleY(.01)
+    }
+    30% {
+        transform: scale(.01, .02);
+        border-radius: 0;
+    }
+    35% {
+        border-radius: 100%;
+        transform: scale(.01, .02)
+    }
+    45% {
+        transform: scale(.05, .1)
+    }
+    60% {
+        transform: scale(0);
+        border-radius: 100%;
+    }
+    100% {
+        transform: scale(0);
+        border-radius: 100%;
+    }
+}
 h1 {
-    margin: 0 0 2% 0;
+    margin: 0 0 .4vw 0;
+    font-size: 1.6vw;
+}
+.contents .left,
+.contents .right {
+    font-size: .85vw;
+}
+p {
+    margin: 0 0 .5vw 0;
+}
+ul {
+    margin: 0 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+ul li {
+    text-indent: 0;
+    list-style-position: inside;
+    margin: 0 0 .3vw 0;
+}
+.zoom h1 {
+    font-size: calc(1.6vw * 1.811624);
+}
+.zoom .contents .left,
+.zoom .contents .right {
+    font-size: calc(.85vw * 1.811624);
+}
+.zoom p {
+    margin: 0 0 calc(.5vw * 1.811624) 0;
+}
+.zoom ul li {
+    margin: 0 0 calc(.3vw * 1.811624) 0;
 }
 .container {
     width: 100%;
@@ -27,7 +85,7 @@ h1 {
     transition: .3s ease-out;
     transform-origin: 53.9% 39.3%;
 }
-.container.zoom {
+.zoom {
     transform: scale(1.811624);
 }
 .rick-bg {
@@ -40,13 +98,16 @@ h1 {
 body {
     overflow: hidden;
     background: rgb(181, 213, 179);
-    cursor: url(../images/rick-hand-64.png) 20 2, url(../images/rick-hand-small.png) 20 2, auto;
+    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;
 }
 body * {
-    cursor: url(../images/rick-hand-64.png) 20 2, url(../images/rick-hand-small.png) 20 2, auto;
+    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;
 }
 html[data-useragent*=Firefox] #video {
     z-index: 2;
+}
+html[data-useragent*=Firefox] #video:before {
+    display: none;
 }
 .cover {
     width: 100%;
@@ -57,6 +118,10 @@ html[data-useragent*=Firefox] #video {
 }
 .tv-on .cover {
     display: none;
+}
+.tv-off .cover.animated {
+    z-index: 5;
+    animation: tvoff .6s ease-out;
 }
 #video {
     width: 36.8%;
@@ -90,9 +155,13 @@ html[data-useragent*=Firefox] #video {
 }
 html[data-useragent*=Firefox] #video:after {
     background: url(../images/tv-cover.png) center;
-    background-size: cover;
+    background-size: contain;
 }
-.container.zoom #video {
+html[data-useragent*=Firefox] .menu-overlay #video:after,
+html[data-useragent*=Firefox] .menu-overlay #video::before {
+    margin-top: -1%;
+}
+.zoom #video {
     width: 66.667%;
     top: 10.5%;
     transform: translateX(-50.1%) scale(.55199092085);
@@ -112,36 +181,54 @@ html[data-useragent*=Firefox] #video:after {
     border: 0px solid white;
     /*    display: none;*/
 }
-.channel:after {
-    content: "CH-" attr(data-channel-id);
+.channel:after,
+.mute .channel:before {
     display: block;
     position: absolute;
-    top: 18px;
-    left: 15px;
     font-family: "Arial", sans-serif;
     font-size: 36px;
+    font-size: 1.88vw;
     color: limegreen;
     backface-visibility: hidden;
-    background: rgba(0, 0, 0, .5);
     padding: 5px;
+    opacity: 0;
+    top: 4.5%;
+    pointer-events: none
+}
+.channel:after {
+    background: rgba(0, 0, 0, .5);
+    content: "CH-" attr(data-channel-id);
+    left: 2.15%;
     opacity: 1;
 }
+.mute .channel:before {
+    content: "\01F507";
+    opacity: 1;
+    right: 2.15%;
+    font-size: 2.4vw;
+    z-index: 1;
+    line-height: 1;
+}
 .channel.show:after {
-    animation: channel-display 2s forwards;
+    animation: channel-display 5s forwards;
 }
 .channel.reset:after {
     animation: animation-reset .1s forwards;
 }
-.container.zoom #yt-contain:after {
-    font-size: calc(36px * 1.811624);
-    top: calc(15px * 1.811624);
-    left: calc(15px * 1.811624);
+.menu-overlay .channel:after {
+    animation: none;
+}
+.zoom.mute .channel:before {
+    font-size: calc(2.4vw * 1.811624);
+}
+.zoom #yt-contain:after {
+    font-size: calc(1.88vw * 1.811624);
 }
 .menu-overlay #yt-contain {
     transform: scale(.41);
     border: 6px solid white;
 }
-.container.zoom .menu-overlay #yt-contain {
+.zoom .menu-overlay #yt-contain {
     border: calc(6px * 1.811624) solid white;
 }
 #video iframe,
@@ -192,15 +279,23 @@ html[data-useragent*=Firefox] #video:after {
 .tv-menu .left {
     float: left;
     width: 40%;
-    margin-left: 3%;
-    margin-top: 30%;
+    margin-left: 1.1vw;
+    margin-top: 11vw;
+}
+.zoom .tv-menu .left {
+    margin-left: calc(1.1vw * 1.811624);
+    margin-top: calc(11vw * 1.811624);
 }
 .tv-menu .right {
     width: 51%;
     float: right;
     display: block;
-    margin-right: 3%;
-    margin-top: 3.5%
+    margin-right: 1.1vw;
+    margin-top: 1.3vw;
+}
+.zoom .tv-menu .right {
+    margin-right: calc(1.1vw * 1.811624);
+    margin-top: calc(1.3vw * 1.811624);
 }
 .remote {
     position: fixed;

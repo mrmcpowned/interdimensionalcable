@@ -2,10 +2,14 @@ var videoObj = {};
 var videoInfo = {};
 var videoList = [];
 var redditData = {};
-var channelNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "101", "C137", "666", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
+var channelNames = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
+var audioQuotes = ["sexsells", "improv", "relax", "billmurray"];
 var tvState = 0;
+//Since I'm depending on reddit's api for getting curated videos, I have to prepare for occasion where reddit would be down 
+var redditState = 0;
 var muteState = 0;
 var menuState = 0;
+var duckState = 0;
 var animationState = 0;
 var tvAudioLevel = 50;
 var channelDelayState = 0;
@@ -44,7 +48,7 @@ function triggerAnimation(callback) {
         animationState = 1;
         setTimeout(function () {
             animationState = 0;
-        }, animationDelay);
+        }, animationDelay + 300);
         bgv.play();
         delay = (bgv.duration * 1000) - 800;
         clearTimeout(actionDelay);
@@ -57,45 +61,48 @@ function triggerAnimation(callback) {
 function turnOnOffTV() {
     if (!tvState) {
         tvState = 1;
-        videoList = shuffle(videoList);
-        currentVideo = videoList[0];
-        currentVideoID = 0;
-        $('.container').toggleClass('tv-on');
-        player = new YT.Player('yt-iframe', {
-            width: 1280,
-            height: 720,
-            videoId: currentVideo,
-            playerVars: {
-                'autoplay': 1,
-                'controls': 0,
-                'showinfo': 0,
-                'rel': 0,
-                'iv_load_policy': 3,
-                'disablekb': 1
-            },
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': onPlayerError
-            }
-        });
+        if (redditState) {
+            currentVideo = videoList[currentVideoID];
+            $('body').toggleClass('tv-on');
+            $('body').removeClass('tv-off');
+            player = new YT.Player('yt-iframe', {
+                width: 1280,
+                height: 720,
+                videoId: currentVideo,
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'iv_load_policy': 3,
+                    'disablekb': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+        cha.play();
         if (muteState) {
-            player.mute();
+            $('.container').addClass('mute');
         }
         changeChannelName();
-        $('#yt-contain').addClass("reset")
-        setTimeout(function () {
-            $('#yt-contain').removeClass("reset");
-        }, 200);
 
     } else if (tvState) {
         clearTimeout(autoChannelDelay);
-        $('.container').toggleClass('tv-on');
+        getVideos();
+        $('body').toggleClass('tv-on');
+        $('body').addClass('tv-off');
         if (menuState) {
             console.log('tv menu reset');
             menuToggle();
         }
-        player.destroy();
+        if (redditState) {
+            player.destroy();
+        }
+        bga.play();
         channelDelayState = 0;
         tvState = 0;
     }
@@ -109,19 +116,26 @@ function turnOnOffTV() {
 //}
 
 function onPlayerError() {
-    console.error('Error Loading Video, Changing channel in 2 seconds')
-    setTimeout(function () {
+    console.error('Error Loading Video, Changing channel in 2 seconds');
+    autoChannelDelay = setTimeout(function () {
         triggerAnimation(nextChannel);
     }, 2000);
 }
 
 function onPlayerReady(event) {
+    if (muteState) {
+        player.mute();
+    }
+    $('#yt-contain').addClass("reset")
+    setTimeout(function () {
+        $('#yt-contain').removeClass("reset");
+    }, 200);
     event.target.setVolume(tvAudioLevel);
     console.log("Player Ready!");
 }
 
 function onPlayerStateChange(event) {
-    if (event.data == 1 && !channelDelayState) {
+    if (event.data === 1 && !channelDelayState) {
         clearTimeout(autoChannelDelay);
         var acdMS = player.getDuration() * 1000 - delay - 300;
         autoChannelDelay = setTimeout(function () {
@@ -131,30 +145,30 @@ function onPlayerStateChange(event) {
         console.log("Timeout Set on state change!");
         channelDelayState = 1;
     }
-    if (event.data == 2) {
+    if (event.data === 2) {
         event.target.playVideo();
     }
-    if (event.data == 0) {
+    if (event.data === 0) {
         nextChannel();
     }
-    event.target.setVolume(tvAudioLevel);
+    //    event.target.setVolume(tvAudioLevel);
 }
 
 function nextChannel() {
-    if (tvState) {
+    if (tvState && redditState) {
+        if (Math.random() <= .1) {
+            setTimeout(playQuote(), 200);
+        }
         clearTimeout(autoChannelDelay);
         console.log("Timeout Removed on channel change!");
         currentVideoID++;
         currentVideo = videoList[currentVideoID];
         player.loadVideoById(currentVideo);
         if (currentVideoID == videoList.length) {
-            videoObj;
-            videoInfo = {};
-            videoList = [];
             getVideos();
-            currentVideoID = 0;
             console.log("Video list refreshed!");
         }
+        cha.play();
         console.log("Channel Changed!");
         changeChannelName();
         $('#yt-contain').addClass("reset")
@@ -166,7 +180,7 @@ function nextChannel() {
 }
 
 function volumeUp(direction) {
-    if (tvState) {
+    if (tvState && redditState && !duckState) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
         }
@@ -180,7 +194,7 @@ function volumeUp(direction) {
 }
 
 function volumeDown() {
-    if (tvState) {
+    if (tvState && redditState && !duckState) {
         if (tvAudioLevel !== 0) {
             tvAudioLevel -= 10;
         } else if (tvAudioLevel === 0) {
@@ -192,12 +206,14 @@ function volumeDown() {
 }
 
 function mute() {
-    if (tvState) {
+    if (tvState && redditState) {
         if (!muteState) {
             player.mute();
+            $('.container').addClass('mute');
             muteState = 1;
         } else {
             player.unMute();
+            $('.container').removeClass('mute');
             muteState = 0;
         }
     }
@@ -219,7 +235,7 @@ function menuToggle() {
 }
 
 function openVideo() {
-    if (tvState) {
+    if (tvState && redditState) {
         window.open(player.getVideoUrl(), '_blank');
     }
 }
@@ -227,6 +243,40 @@ function openVideo() {
 function changeChannelName() {
     var channelName = channelNames[Math.floor(Math.random() * channelNames.length)];
     $("[data-channel-id]").attr("data-channel-id", channelName);
+}
+
+function audioDuck(direction, value, eventData) {
+    //    console.log("Current volume level: " + player.getVolume());
+    if (eventData !== "") {
+        //        console.log("Removing ended event");
+        eventData.target.removeEventListener(eventData.type, function () {})
+    }
+    var playerVolume = player.getVolume();
+    //A direction Value of 1 ducks, whereas a value of 0 reverts
+    if (direction) {
+        //        console.log("Ducking volume");
+        player.setVolume(player.getVolume() * value);
+    } else {
+        //        console.log("Reverting volume");
+        player.setVolume(player.getVolume() / value);
+    }
+    //    console.log("Current volume level after Ducking/Reverting: " + player.getVolume());
+}
+
+function playQuote() {
+    if (!duckState) {
+        duckState = 1;
+        var duckFloat = .1;
+        console.log("Starting quote playing");
+        qa.src = "audio/quotes/" + audioQuotes[Math.floor(Math.random() * audioQuotes.length)] + ".mp3";
+        audioDuck(1, duckFloat, "");
+        qa.play();
+        qa.addEventListener("ended", function (e) {
+            //            console.log("Quote playback ended");
+            audioDuck(0, duckFloat, e);
+            duckState = 0;
+        });
+    }
 }
 
 function sortVideoData() {
@@ -238,6 +288,7 @@ function sortVideoData() {
     With the regex ontop, I'm finding URLs wit ha timestamp so I can later ignore then in the loop below. I know this can most likely be done with RegEx itself, but since I'm looping through
     */
     var videoIdReg = new RegExp(/(?:(?:http|https):\/\/(?:youtu\.be|youtube\.com|.*\.youtube\.com)\/)(?:watch\?(?:.*?)v=(.*?)&|watch\?(?:.*?)v=(.*)|watch\?v=(.*?)&|watch\?v=(.*)|(.*)\?|(.*))/);
+    //    var videoIdReg = new RegExp(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
     for (var i = 0; i < videoObj.data.children.length; i++) {
         var submittedUrl = videoObj.data.children[i].data.url;
         if (tcode.test(submittedUrl)) {
@@ -262,6 +313,10 @@ function sortVideoData() {
 }
 
 function getVideos() {
+    videoObj = {};
+    videoInfo = {};
+    videoList = [];
+    currentVideoID = 0;
     var timeOptions = ["week", "month", "year", "all"];
     var sortOptions = ["relevance", "hot", "top", "new", "comments"];
     var redditURL = "https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be+AND+self%3Ano&restrict_sr=on&sort=" + sortOptions[Math.floor(Math.random() * sortOptions.length)] + "&t=" + timeOptions[Math.floor(Math.random() * timeOptions.length)] + "&limit=50";
@@ -269,13 +324,21 @@ function getVideos() {
             url: redditURL
         })
         .done(function (data) {
+            redditState = 1;
             videoObj = data;
             sortVideoData();
+            $('.container').removeClass('offline');
+        }).fail(function () {
+            redditState = 0;
+            $('.container').addClass('offline');
         });
 }
 
 $(function () {
     bgv = document.getElementById("rick-bg");
+    bga = document.getElementById("off-audio");
+    cha = document.getElementById("switch-audio");
+    qa = document.getElementById("quote-player");
     getVideos();
     $.ajax({
         url: "https://www.reddit.com/api/me.json"

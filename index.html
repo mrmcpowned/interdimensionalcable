@@ -3,12 +3,14 @@
 
 <!--
 DONE: Add a zoom-in functionality
+TODO: Volume animations
+TODO: Offline Animations
 TODO: Animation for Channel number on change
 TODO: Info Button
 TODO: Make proper remote
 TODO: Upvote on reddit using up button? 
 DONE: Make sure Muting works 
-TODO: Turn off animation?
+DONE: Turn off animation?
 -->
 
 <head>
@@ -35,16 +37,30 @@ TODO: Turn off animation?
         <!--        <img src="images/Rick-morty-tv.png" alt="Rick and Morty TV Background" class="rick-bg">-->
         <video src="video/rick-tv.webm" class="rick-bg" id="rick-bg" preload>
         </video>
+        <audio src="audio/tvoff.mp3" id="off-audio" preload></audio>
+        <audio src="audio/channel-switch.mp3" id="switch-audio" preload></audio>
+        <audio src="" id="quote-player"></audio>
         <div id="video">
+            <div class="cover animated"></div>
             <div class="cover"></div>
             <div id="yt-contain" class="channel show" data-channel-id="👌😂">
                 <div id="yt-iframe"></div>
             </div>
             <div class="tv-menu">
                 <div class="contents">
-                    <div class="left">Left Area</div>
+                    <div class="left">
+                        <p>Left Menu</p>
+                    </div>
                     <div class="right">
                         <h1>Menu</h1>
+                        <ul>
+                            <li><b>Power Button</b>: Turns TV On/Off</li>
+                            <li><b>Zoom</b>: Zooms the TV in or out for a better view</li>
+                            <li><b>CH UP</b>: Changes the channel</li>
+                            <li><b>VOL</b> UP/DOWN: Adjusts the TV's volume</li>
+                            <li><b>OK</b>: Opens the current video's URL in a new tab</li>
+                            <li><b>MUTE</b>: Mutes the TV's audio</li>
+                        </ul>
                     </div>
                 </div>
             </div>
