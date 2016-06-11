@@ -141,7 +141,7 @@ function nextChannel() {
         setTimeout(function () {
             $('#yt-contain').removeClass("reset");
         }, 200);
-        isNextSet = 0;
+        isNextSet = !isNextSet;
     }
 }
 
