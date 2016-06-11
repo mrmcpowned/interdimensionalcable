@@ -1,18 +1,12 @@
-var videoObj = {};
-var videoInfo = {};
-var videoList = [];
-var redditHash;
 var channelNames = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 var audioQuotes = ["sexsells", "improv", "relax", "billmurray"];
-var tvState = 0;
-//Since I'm depending on reddit's api for getting curated videos, I have to prepare for occasion where reddit would be down 
-var loginState = 0;
-var muteState = 0;
-var menuState = 0;
-var duckState = 0;
-var animationState = 0;
+var isTVOn = false;
+var isTVMuted = false;
+var isMenuOpen = false;
+var isAudioDucked = false;
+var isAnimationPlaying = false;
 var tvAudioLevel = 50;
-var channelDelayState = 0;
+var isNextSet = false;
 var player;
 var bgv;
 var bga;
@@ -21,34 +15,13 @@ var qa;
 var delay;
 var autoChannelDelay;
 
-//Fisher-Yates shuffle from Mike Bostock's blog
-function shuffle(array) {
-    var currentIndex = array.length,
-        temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-}
-
 function triggerAnimation(callback) {
     var actionDelay;
     var animationDelay = bgv.duration * 1000;
-    if (!animationState) {
-        animationState = 1;
+    if (!isAnimationPlaying) {
+        isAnimationPlaying = !isAnimationPlaying;
         setTimeout(function () {
-            animationState = 0;
+            isAnimationPlaying = !isAnimationPlaying;
         }, animationDelay + 300);
         bgv.play();
         delay = (bgv.duration * 1000) - 800;
@@ -60,8 +33,8 @@ function triggerAnimation(callback) {
 }
 
 function turnOnOffTV() {
-    if (!tvState) {
-        tvState = 1;
+    if (!isTVOn) {
+        isTVOn = !isTVOn;
         $('body').toggleClass('tv-on');
         $('body').removeClass('tv-off');
         player = new YT.Player('yt-iframe', {
@@ -83,23 +56,23 @@ function turnOnOffTV() {
             }
         });
         cha.play();
-        if (muteState) {
+        if (isTVMuted) {
             $('.container').addClass('mute');
         }
         changeChannelName();
 
-    } else if (tvState) {
+    } else if (isTVOn) {
         clearTimeout(autoChannelDelay);
         $('body').toggleClass('tv-on');
         $('body').addClass('tv-off');
-        if (menuState) {
+        if (isMenuOpen) {
             console.log('tv menu reset');
             menuToggle();
         }
         player.destroy();
         bga.play();
-        channelDelayState = 0;
-        tvState = 0;
+        isNextSet = !isNextSet;
+        isTVOn = !isTVOn;
     }
 }
 
@@ -118,39 +91,43 @@ function onPlayerError() {
 }
 
 function onPlayerReady(event) {
-    if (muteState) {
-        player.mute();
-    }
+    if (isTVMuted) player.mute();
+    event.target.setVolume(tvAudioLevel);
+
     $('#yt-contain').addClass("reset");
     setTimeout(function () {
         $('#yt-contain').removeClass("reset");
     }, 200);
-    event.target.setVolume(tvAudioLevel);
     console.log("Player Ready!");
 }
 
 function onPlayerStateChange(event) {
-    if (event.data === 1 && !channelDelayState) {
-        clearTimeout(autoChannelDelay);
-        var acdMS = player.getDuration() * 1000 - delay - 300;
-        autoChannelDelay = setTimeout(function () {
-            console.log("Channel auto-changed!");
-            triggerAnimation(nextChannel);
-        }, acdMS);
-        console.log("Timeout Set on state change!");
-        channelDelayState = 1;
+    switch (event.data) {
+        case 0:
+            nextChannel();
+            break;
+        case 1:
+            if (!isNextSet) {
+                clearTimeout(autoChannelDelay);
+                var acdMS = player.getDuration() * 1000 - delay - 300;
+                autoChannelDelay = setTimeout(function () {
+                    console.log("Channel auto-changed!");
+                    triggerAnimation(nextChannel);
+                }, acdMS);
+                console.log("Timeout Set on state change!");
+                isNextSet = !isNextSet;
+            }
+            break;
+        case 2:
+            event.target.playVideo();
+            break;
+        default:
+            ;
     }
-    if (event.data === 2) {
-        event.target.playVideo();
-    }
-    if (event.data === 0) {
-        nextChannel();
-    }
-    //    event.target.setVolume(tvAudioLevel);
 }
 
 function nextChannel() {
-    if (tvState) {
+    if (isTVOn) {
         if (Math.random() <= 0.1) {
             setTimeout(playQuote(), 200);
         }
@@ -164,12 +141,12 @@ function nextChannel() {
         setTimeout(function () {
             $('#yt-contain').removeClass("reset");
         }, 200);
-        channelDelayState = 0;
+        isNextSet = 0;
     }
 }
 
 function volumeUp(direction) {
-    if (tvState && !duckState) {
+    if (isTVOn && !isAudioDucked) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
             $('.volume').addClass("reset");
@@ -178,7 +155,7 @@ function volumeUp(direction) {
             }, 200);
             $('.volume').attr('data-volume', tvAudioLevel);
         }
-        if (muteState) {
+        if (isTVMuted) {
             console.log('Un Muted Audio on Volume Raise!');
             mute();
         }
@@ -188,7 +165,7 @@ function volumeUp(direction) {
 }
 
 function volumeDown() {
-    if (tvState && !duckState) {
+    if (isTVOn && !isAudioDucked) {
         if (tvAudioLevel === 10) {
             tvAudioLevel -= 10;
             mute();
@@ -206,11 +183,11 @@ function volumeDown() {
 }
 
 function mute() {
-    if (tvState) {
-        if (!muteState) {
+    if (isTVOn) {
+        if (!isTVMuted) {
             player.mute();
             $('.container').addClass('mute');
-            muteState = 1;
+            isTVMuted = !isTVMuted;
         } else {
             player.unMute();
             $('.container').removeClass('mute');
@@ -218,7 +195,7 @@ function mute() {
             setTimeout(function () {
                 $('.volume').removeClass("reset");
             }, 200);
-            muteState = 0;
+            isTVMuted = !isTVMuted;
         }
     }
 }
@@ -228,18 +205,15 @@ function zoomToggle() {
 }
 
 function menuToggle() {
-    if (tvState) {
-        if (!menuState) {
-            menuState = 1;
-        } else {
-            menuState = 0;
-        }
-        $('.container').toggleClass('menu-overlay');
+    if (isTVOn) {
+        isMenuOpen = !isMenuOpen;
     }
+    $('.container').toggleClass('menu-overlay');
 }
 
+
 function openVideo() {
-    if (tvState) {
+    if (isTVOn) {
         window.open(player.getVideoUrl(), '_blank');
     }
 }
@@ -268,8 +242,8 @@ function audioDuck(direction, value, eventData) {
 }
 
 function playQuote() {
-    if (!duckState) {
-        duckState = 1;
+    if (!isAudioDucked) {
+        isAudioDucked = !isAudioDucked;
         var duckFloat = 0.1;
         console.log("Starting quote playing");
         qa.src = "audio/quotes/" + audioQuotes[Math.floor(Math.random() * audioQuotes.length)] + ".mp3";
@@ -278,7 +252,7 @@ function playQuote() {
         qa.addEventListener("ended", function (e) {
             //            console.log("Quote playback ended");
             audioDuck(0, duckFloat, e);
-            duckState = 0;
+            isAudioDucked = !isAudioDucked;
         });
     }
 }
