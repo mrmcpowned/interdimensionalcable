@@ -98,10 +98,10 @@ ul li {
 body {
     overflow: hidden;
     background: rgb(181, 213, 179);
-    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;
+    /*cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
 }
 body * {
-    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;
+    /*cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
 }
 html[data-useragent*=Firefox] #video {
     z-index: 2;
