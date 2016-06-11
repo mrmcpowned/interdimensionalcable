@@ -11,6 +11,7 @@ TODO: Make proper remote
 TODO: Upvote on reddit using up button? 
 DONE: Make sure Muting works 
 DONE: Turn off animation?
+TODO: Opengraph meta data to make things look nice when finished
 -->
 
 <head>
@@ -20,6 +21,7 @@ DONE: Turn off animation?
     <script src="js/get-video.js"></script>
     <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.2/normalize.css">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -43,23 +45,30 @@ DONE: Turn off animation?
         <div id="video">
             <div class="cover animated"></div>
             <div class="cover"></div>
-            <div id="yt-contain" class="channel show" data-channel-id="👌😂">
+            <div id="yt-contain" class="channel show" data-channel-id="??">
+                <div class="cover static"></div>
+                <div class="volume" data-volume="60"></div>
                 <div id="yt-iframe"></div>
             </div>
             <div class="tv-menu">
                 <div class="contents">
                     <div class="left">
-                        <p>Left Menu</p>
+                        <p>I'm <a href="https://mrmcpowned.com">Mr McPowned</a>. I <a href="http://gamepadviewer.com">kinda make stuff</a>. Some people call me <a href="http://chrisr.xyz">Chris</a>, and I don't really <a href="https://twitter.com/mrmcpowned">have much to say</a>. </p>
+                        <p>This thing's also <a href="https://github.com/mrmcpowned/interdimensionalcable">on github</a> if you wanna check that out.</p>
+                        <p><a href="https://steamcommunity.com/id/2Mill/">This guy</a> gave me the idea, but he didn't really help with anything.</p>
                     </div>
                     <div class="right">
-                        <h1>Menu</h1>
+                        <h1>Menu - MrMcTV v1.0</h1>
+                        <p><i>A non-stop stream of intergalactic content from <a href="https://reddit.com/r/InterdimensionalCable">/r/InterdimensionalCable</a> straight to your eyeholes.</i></p>
                         <ul>
                             <li><b>Power Button</b>: Turns TV On/Off</li>
                             <li><b>Zoom</b>: Zooms the TV in or out for a better view</li>
                             <li><b>CH UP</b>: Changes the channel</li>
-                            <li><b>VOL</b> UP/DOWN: Adjusts the TV's volume</li>
+                            <li><b>VOL UP/DOWN</b>: Adjusts the TV's volume</li>
+                            <li><b>UP/DOWN Arrows</b>: Votes for the post on /r/InterdimensionalCable</li>
                             <li><b>OK</b>: Opens the current video's URL in a new tab</li>
                             <li><b>MUTE</b>: Mutes the TV's audio</li>
+                            <li><b>NO SIGNAL</b>: Reddit's API is down, Turn your TV On and Off again to see if the signal is back.</li>
                         </ul>
                     </div>
                 </div>
@@ -73,7 +82,9 @@ DONE: Turn off animation?
         b.setAttribute('data-useragent', navigator.userAgent);
         b.setAttribute('data-platform', navigator.platform);
         b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window)) ? ' touch' : '');
-
+        //I'm lazy and don't wanna set target="_blank" on all those links
+        var thisSite = window.location.hostname;
+        $('a[href^="http://"], a[href^="https://"]').not('a[href^="http://' + thisSite + '"], a[href^="https://' + thisSite + '"]').attr('target','_blank');
     </script>
 
 </body>

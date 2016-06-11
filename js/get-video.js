@@ -2,11 +2,13 @@ var videoObj = {};
 var videoInfo = {};
 var videoList = [];
 var redditData = {};
+var redditHash;
 var channelNames = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 var audioQuotes = ["sexsells", "improv", "relax", "billmurray"];
 var tvState = 0;
 //Since I'm depending on reddit's api for getting curated videos, I have to prepare for occasion where reddit would be down 
 var redditState = 0;
+var loginState = 0;
 var muteState = 0;
 var menuState = 0;
 var duckState = 0;
@@ -17,6 +19,9 @@ var currentVideo;
 var currentVideoID;
 var player;
 var bgv;
+var bga;
+var cha;
+var qa;
 var delay;
 var autoChannelDelay;
 
@@ -61,10 +66,10 @@ function triggerAnimation(callback) {
 function turnOnOffTV() {
     if (!tvState) {
         tvState = 1;
+        $('body').toggleClass('tv-on');
+        $('body').removeClass('tv-off');
         if (redditState) {
             currentVideo = videoList[currentVideoID];
-            $('body').toggleClass('tv-on');
-            $('body').removeClass('tv-off');
             player = new YT.Player('yt-iframe', {
                 width: 1280,
                 height: 720,
@@ -126,7 +131,7 @@ function onPlayerReady(event) {
     if (muteState) {
         player.mute();
     }
-    $('#yt-contain').addClass("reset")
+    $('#yt-contain').addClass("reset");
     setTimeout(function () {
         $('#yt-contain').removeClass("reset");
     }, 200);
@@ -156,7 +161,7 @@ function onPlayerStateChange(event) {
 
 function nextChannel() {
     if (tvState && redditState) {
-        if (Math.random() <= .1) {
+        if (Math.random() <= 0.1) {
             setTimeout(playQuote(), 200);
         }
         clearTimeout(autoChannelDelay);
@@ -171,7 +176,7 @@ function nextChannel() {
         cha.play();
         console.log("Channel Changed!");
         changeChannelName();
-        $('#yt-contain').addClass("reset")
+        $('#yt-contain').addClass("reset");
         setTimeout(function () {
             $('#yt-contain').removeClass("reset");
         }, 200);
@@ -183,9 +188,14 @@ function volumeUp(direction) {
     if (tvState && redditState && !duckState) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
+            $('.volume').addClass("reset");
+            setTimeout(function () {
+                $('.volume').removeClass("reset");
+            }, 200);
+            $('.volume').attr('data-volume', tvAudioLevel);
         }
         if (muteState) {
-            console.log('Un Muted Audio on Volume Raise!')
+            console.log('Un Muted Audio on Volume Raise!');
             mute();
         }
         player.setVolume(tvAudioLevel);
@@ -195,13 +205,19 @@ function volumeUp(direction) {
 
 function volumeDown() {
     if (tvState && redditState && !duckState) {
-        if (tvAudioLevel !== 0) {
+        if (tvAudioLevel === 10) {
             tvAudioLevel -= 10;
-        } else if (tvAudioLevel === 0) {
             mute();
+        } else if (tvAudioLevel > 10) {
+            tvAudioLevel -= 10;
+            $('.volume').addClass("reset");
+            setTimeout(function () {
+                $('.volume').removeClass("reset");
+            }, 200);
+            $('.volume').attr('data-volume', tvAudioLevel);
+            player.setVolume(tvAudioLevel);
+            console.log("Volume Lowered!");
         }
-        player.setVolume(tvAudioLevel);
-        console.log("Volume Lowered!");
     }
 }
 
@@ -214,6 +230,10 @@ function mute() {
         } else {
             player.unMute();
             $('.container').removeClass('mute');
+            $('.volume').addClass("reset");
+            setTimeout(function () {
+                $('.volume').removeClass("reset");
+            }, 200);
             muteState = 0;
         }
     }
@@ -249,7 +269,7 @@ function audioDuck(direction, value, eventData) {
     //    console.log("Current volume level: " + player.getVolume());
     if (eventData !== "") {
         //        console.log("Removing ended event");
-        eventData.target.removeEventListener(eventData.type, function () {})
+        eventData.target.removeEventListener(eventData.type, function () {});
     }
     var playerVolume = player.getVolume();
     //A direction Value of 1 ducks, whereas a value of 0 reverts
@@ -266,7 +286,7 @@ function audioDuck(direction, value, eventData) {
 function playQuote() {
     if (!duckState) {
         duckState = 1;
-        var duckFloat = .1;
+        var duckFloat = 0.1;
         console.log("Starting quote playing");
         qa.src = "audio/quotes/" + audioQuotes[Math.floor(Math.random() * audioQuotes.length)] + ".mp3";
         audioDuck(1, duckFloat, "");
@@ -277,6 +297,19 @@ function playQuote() {
             duckState = 0;
         });
     }
+}
+
+function checkLoggedIn() {
+    var jqxhr = $.ajax({
+        url: "https://api.reddit.com/api/me.json"
+    }).done(function (response) {
+        if (typeof response.data.modhash !== "undefined") {
+            loginState = 1;
+            redditHash = response.data.modhash;
+        } else {
+            loginState = 0;
+        }
+    });
 }
 
 function sortVideoData() {
@@ -303,10 +336,11 @@ function sortVideoData() {
                 }
             }
             videoList.push(capturedId);
-            videoInfo[capturedId] = {
-                title: videoObj.data.children[i].data.media.oembed.title,
-                description: videoObj.data.children[i].data.media.oembed.description
-            };
+            //            videoInfo[capturedId] = {
+            //                title: videoObj.data.children[i].data.media.oembed.title,
+            //                description: videoObj.data.children[i].data.media.oembed.description
+            //            };
+            videoInfo[capturedId] = videoObj.data.children[i].data;
         }
     }
     videoList = shuffle(videoList);

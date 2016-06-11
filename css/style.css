@@ -17,6 +17,15 @@
         opacity: 0;
     }
 }
+@keyframes volume-reset {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes tvoff {
     0% {
         background: white;
@@ -54,6 +63,12 @@ h1 {
 }
 p {
     margin: 0 0 .5vw 0;
+}
+a{
+    color: limegreen;
+}
+a:visited{
+    color: darkgreen;
 }
 ul {
     margin: 0 0 0 0;
@@ -98,10 +113,10 @@ ul li {
 body {
     overflow: hidden;
     background: rgb(181, 213, 179);
-    /*cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
+/*    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
 }
 body * {
-    /*cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
+/*    cursor: url(../images/rick-hand-64.png) 10 2, url(../images/rick-hand-small.png) 20 2, auto;*/
 }
 html[data-useragent*=Firefox] #video {
     z-index: 2;
@@ -123,6 +138,33 @@ html[data-useragent*=Firefox] #video:before {
     z-index: 5;
     animation: tvoff .6s ease-out;
 }
+.tv-on .offline .cover.static{
+    background: url('../images/static.gif');
+    background-size: cover;
+    display: block;
+    z-index: 0;
+}
+
+
+.tv-on .offline .cover.static:after{
+    content: "NO SIGNAL";
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%);
+    color: limegreen;
+    font-weight: bold;
+    font-size: 3vw;
+    padding: .4vw;
+    background: rgba(0,0,0,.5);
+}
+
+.tv-on .zoom.offline .cover.static:after{
+    font-size: calc(3vw * 1.811624);
+    padding: calc(.4vw * 1.811624)
+}
+
 #video {
     width: 36.8%;
     top: 25.2%;
@@ -231,6 +273,64 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 .zoom .menu-overlay #yt-contain {
     border: calc(6px * 1.811624) solid white;
 }
+
+.volume:after{
+    pointer-events: none;
+    position: absolute;
+    z-index: 1;
+    animation: channel-display 3s forwards;
+    font-size: 3vw;
+    font-weight: bold;
+    font-family: "PT Mono", monospace;
+    color: limegreen;
+    bottom: 1vw;
+    white-space: nowrap;
+    left: 50%;
+    transform: translateX(-50%) scale(.7,.6);
+}
+
+.zoom .volume:after{
+    font-size: calc(3vw * 1.811624);
+    bottom: calc(1vw * 1.811624);
+}
+.volume.reset:after {
+    animation: volume-reset .1s forwards;
+}
+.mute .volume:after{
+    visibility: hidden;
+}
+
+.volume[data-volume="10"]:after{
+    content: "VOL |•••••••••";
+}
+.volume[data-volume="20"]:after{
+    content: "VOL ||••••••••"
+}
+.volume[data-volume="30"]:after{
+    content: "VOL |||•••••••"
+}
+.volume[data-volume="40"]:after{
+    content: "VOL ||||••••••"
+}
+.volume[data-volume="50"]:after{
+    content: "VOL |||||•••••";
+}
+.volume[data-volume="60"]:after{
+    content: "VOL ||||||••••";
+}
+.volume[data-volume="70"]:after{
+    content: "VOL |||||||•••"
+}
+.volume[data-volume="80"]:after{
+    content: "VOL ||||||||••"
+}
+.volume[data-volume="90"]:after{
+    content: "VOL |||||||||•"
+}
+.volume[data-volume="100"]:after{
+    content: "VOL ||||||||||"
+}
+
 #video iframe,
 #video object,
 #video embed,
