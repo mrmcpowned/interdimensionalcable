@@ -64,24 +64,24 @@ function turnOnOffTV() {
         tvState = 1;
         $('body').toggleClass('tv-on');
         $('body').removeClass('tv-off');
-            player = new YT.Player('yt-iframe', {
-                width: 1280,
-                height: 720,
-                videoId: get_video()[0],
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 0,
-                    'showinfo': 0,
-                    'rel': 0,
-                    'iv_load_policy': 3,
-                    'disablekb': 1
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
+        player = new YT.Player('yt-iframe', {
+            width: 1280,
+            height: 720,
+            videoId: get_video(),
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'showinfo': 0,
+                'rel': 0,
+                'iv_load_policy': 3,
+                'disablekb': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': onPlayerError
+            }
+        });
         cha.play();
         if (muteState) {
             $('.container').addClass('mute');
@@ -90,14 +90,13 @@ function turnOnOffTV() {
 
     } else if (tvState) {
         clearTimeout(autoChannelDelay);
-        getVideos();
         $('body').toggleClass('tv-on');
         $('body').addClass('tv-off');
         if (menuState) {
             console.log('tv menu reset');
             menuToggle();
         }
-            player.destroy();
+        player.destroy();
         bga.play();
         channelDelayState = 0;
         tvState = 0;
@@ -157,7 +156,7 @@ function nextChannel() {
         }
         clearTimeout(autoChannelDelay);
         console.log("Timeout Removed on channel change!");
-        player.loadVideoById(get_video()[0]);
+        player.loadVideoById(get_video());
         cha.play();
         console.log("Channel Changed!");
         changeChannelName();
@@ -294,7 +293,7 @@ if (!Array.prototype.randomElement) {
 if (!Array.prototype.randomPop) {
     Array.prototype.randomPop = function () {
         var index = Math.floor(Math.random() * this.length);
-        return this.splice(index, 1);
+        return this.splice(index, 1)[0];
     };
 }
 
