@@ -36,24 +36,26 @@ function turnOnOffTV() {
         isTVOn = !isTVOn;
         $('body').toggleClass('tv-on');
         $('body').removeClass('tv-off');
-        if (!isRedditDown) player = new YT.Player('yt-iframe', {
-            width: 1280,
-            height: 720,
-            videoId: get_video(),
-            playerVars: {
-                'autoplay': 1,
-                'controls': 0,
-                'showinfo': 0,
-                'rel': 0,
-                'iv_load_policy': 3,
-                'disablekb': 1
-            },
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': onPlayerError
-            }
-        });
+        if (!isRedditDown) {
+            player = new YT.Player('yt-iframe', {
+                width: 1280,
+                height: 720,
+                videoId: get_video(),
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'iv_load_policy': 3,
+                    'disablekb': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
         cha.play();
         if (isTVMuted) {
             $('.container').addClass('mute');
@@ -90,22 +92,21 @@ function onPlayerError() {
 }
 
 function onPlayerReady(event) {
-    if (isTVMuted) player.mute();
+    if (isTVMuted) {
+        player.mute();
+    }
     event.target.setVolume(tvAudioLevel);
 
-    $('#yt-contain').addClass("reset");
-    setTimeout(function () {
-        $('#yt-contain').removeClass("reset");
-    }, 200);
+    animationCssReset("#yt-contain");
     console.log("Player Ready!");
 }
 
 function onPlayerStateChange(event) {
     switch (event.data) {
-        case 0:
+        case YT.PlayerState.ENDED:
             nextChannel();
             break;
-        case 1:
+        case YT.PlayerState.PLAYING:
             if (!isNextSet) {
                 clearTimeout(autoChannelDelay);
                 var acdMS = player.getDuration() * 1000 - delay - 300;
@@ -117,21 +118,25 @@ function onPlayerStateChange(event) {
                 isNextSet = !isNextSet;
             }
             break;
-        case 2:
+        case YT.PlayerState.PAUSED:
             event.target.playVideo();
             break;
         default:
     }
 }
 
+function animationCssReset(selector){
+    $(selector).addClass("reset-animation");
+            setTimeout(function () {
+                $(selector).removeClass("reset-animation");
+            }, 200);
+}
+
 function volumeUp() {
     if (isTVOn && !isAudioDucked) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
-            $('.volume').addClass("reset");
-            setTimeout(function () {
-                $('.volume').removeClass("reset");
-            }, 200);
+            animationCssReset(".volume");
             $('.volume').attr('data-volume', tvAudioLevel);
         }
         if (isTVMuted) {
@@ -150,10 +155,7 @@ function volumeDown() {
             mute();
         } else if (tvAudioLevel > 10) {
             tvAudioLevel -= 10;
-            $('.volume').addClass("reset");
-            setTimeout(function () {
-                $('.volume').removeClass("reset");
-            }, 200);
+            animationCssReset(".volume");
             $('.volume').attr('data-volume', tvAudioLevel);
             player.setVolume(tvAudioLevel);
             console.log("Volume Lowered!");
@@ -162,7 +164,7 @@ function volumeDown() {
 }
 
 function mute() {
-    if (isTVOn) {
+    if (isTVOn && !isAudioDucked) {
         if (!isTVMuted) {
             player.mute();
             $('.container').addClass('mute');
@@ -170,10 +172,7 @@ function mute() {
         } else {
             player.unMute();
             $('.container').removeClass('mute');
-            $('.volume').addClass("reset");
-            setTimeout(function () {
-                $('.volume').removeClass("reset");
-            }, 200);
+            animationCssReset(".volume");
             isTVMuted = !isTVMuted;
         }
     }
@@ -327,10 +326,7 @@ var nextChannel = function () {
             cha.play();
             console.log("Channel Changed!");
             changeChannelName();
-            $('#yt-contain').addClass("reset");
-            setTimeout(function () {
-                $('#yt-contain').removeClass("reset");
-            }, 200);
+            animationCssReset("#yt-contain");
             isNextSet = false;
         }
     }
