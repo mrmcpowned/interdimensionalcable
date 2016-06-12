@@ -254,7 +254,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 .channel.show:after {
     animation: channel-display 5s forwards;
 }
-.channel.reset:after {
+.channel.reset-animation:after {
     animation: animation-reset .1s forwards;
 }
 .menu-overlay .channel:after {
@@ -293,7 +293,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     font-size: calc(3vw * 1.811624);
     bottom: calc(1vw * 1.811624);
 }
-.volume.reset:after {
+.volume.reset-animation:after {
     animation: volume-reset .1s forwards;
 }
 .mute .volume:after{
@@ -397,12 +397,113 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     margin-right: calc(1.1vw * 1.811624);
     margin-top: calc(1.3vw * 1.811624);
 }
-.remote {
+.remote.test {
     position: fixed;
     bottom: 10px;
     left: 10px;
     z-index: 5;
 }
+.remote-area{
+    position: fixed;
+    display: block;
+    z-index: 5;
+    bottom: -325px;
+    right: 20px;
+    transition: .24s ease-out;
+}
+.remote-area:hover{
+    bottom: -50px;
+}
+.tips{
+    position: absolute;
+    display: block;
+    right: 105%;
+    width: 120%;
+    background: #f2f2f2;
+    padding: 10px;
+    z-index: -2;
+    
+/*    border-radius: 4% 0% 0 0 / 5% 0% 0 0;*/
+
+}
+
+.remote .top-row, .remote .matrix{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap
+}
+.remote .top-row{
+    margin-bottom: 15px;
+}
+.remote .button{
+    background: #1E2626;
+    color: #F2F2F2;
+    padding: 5px;
+    line-height: 1;
+    font-size: 15px;
+    border-radius: 100%;
+    min-width: 50px;
+    min-height: 18px;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 10px
+}
+.button.red{
+    background: darkred;
+}
+.remote-area .remote{
+    width: 200px;
+    height: 400px;
+    position: relative;
+    background: #d0d9d8;
+    border-radius: 12% 12% 0 0 / 4% 4% 0 0;
+    box-sizing: border-box;
+    padding: 5px
+}
+.button{
+    pointer-events: none;
+}
+.button::selection{
+    background: none;
+}
+.button[id]{
+    pointer-events: all;
+    cursor: pointer;
+}
+.button[id]:active{
+    filter: invert(.7);
+    -webkit-filter: invert(.7);
+}
+.remote-area .remote:after{
+    content: "";
+    display: block;
+    background: #364444;
+    border-top: 28px solid #364444;
+    border-left: 15px solid #364444; 
+    border-right: 15px solid #364444; 
+    border-radius: 40% 40% 0 0 / 7% 7% 0 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: -28px;
+    left: -15px;
+    z-index: -1;
+}
+.remote-area .remote:before{
+    content: "";
+    display: block;
+    border-top: 29px solid black;
+    border-left: 16px solid black; 
+    border-right: 16px solid black; 
+    border-radius: 40% 40% 0 0 / 7% 7% 0 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: -29px;
+    left: -16px;
+    z-index: -2;
+}
+
 
 /*
 .info-bar {
