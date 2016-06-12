@@ -1,5 +1,3 @@
-var channelNames = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
-var audioQuotes = ["sexsells", "improv", "relax", "billmurray"];
 var isTVOn = false;
 var isTVMuted = false;
 var isMenuOpen = false;
@@ -7,6 +5,7 @@ var isAudioDucked = false;
 var isAnimationPlaying = false;
 var tvAudioLevel = 50;
 var isNextSet = false;
+var isRedditDown = true;
 var player;
 var bgv;
 var bga;
@@ -37,7 +36,7 @@ function turnOnOffTV() {
         isTVOn = !isTVOn;
         $('body').toggleClass('tv-on');
         $('body').removeClass('tv-off');
-        player = new YT.Player('yt-iframe', {
+        if (!isRedditDown) player = new YT.Player('yt-iframe', {
             width: 1280,
             height: 720,
             videoId: get_video(),
@@ -69,7 +68,7 @@ function turnOnOffTV() {
             console.log('tv menu reset');
             menuToggle();
         }
-        player.destroy();
+        if (!isRedditDown) player.destroy();
         bga.play();
         isNextSet = !isNextSet;
         isTVOn = !isTVOn;
@@ -122,30 +121,10 @@ function onPlayerStateChange(event) {
             event.target.playVideo();
             break;
         default:
-            ;
     }
 }
 
-function nextChannel() {
-    if (isTVOn) {
-        if (Math.random() <= 0.1) {
-            setTimeout(playQuote(), 200);
-        }
-        clearTimeout(autoChannelDelay);
-        console.log("Timeout Removed on channel change!");
-        player.loadVideoById(get_video());
-        cha.play();
-        console.log("Channel Changed!");
-        changeChannelName();
-        $('#yt-contain').addClass("reset");
-        setTimeout(function () {
-            $('#yt-contain').removeClass("reset");
-        }, 200);
-        isNextSet = !isNextSet;
-    }
-}
-
-function volumeUp(direction) {
+function volumeUp() {
     if (isTVOn && !isAudioDucked) {
         if (tvAudioLevel !== 100) {
             tvAudioLevel += 10;
@@ -218,50 +197,10 @@ function openVideo() {
     }
 }
 
-function changeChannelName() {
-    var channelName = channelNames[Math.floor(Math.random() * channelNames.length)];
-    $("[data-channel-id]").attr("data-channel-id", channelName);
-}
-
-function audioDuck(direction, value, eventData) {
-    //    console.log("Current volume level: " + player.getVolume());
-    if (eventData !== "") {
-        //        console.log("Removing ended event");
-        eventData.target.removeEventListener(eventData.type, function () {});
-    }
-    var playerVolume = player.getVolume();
-    //A direction Value of 1 ducks, whereas a value of 0 reverts
-    if (direction) {
-        //        console.log("Ducking volume");
-        player.setVolume(player.getVolume() * value);
-    } else {
-        //        console.log("Reverting volume");
-        player.setVolume(player.getVolume() / value);
-    }
-    //    console.log("Current volume level after Ducking/Reverting: " + player.getVolume());
-}
-
-function playQuote() {
-    if (!isAudioDucked) {
-        isAudioDucked = !isAudioDucked;
-        var duckFloat = 0.1;
-        console.log("Starting quote playing");
-        qa.src = "audio/quotes/" + audioQuotes[Math.floor(Math.random() * audioQuotes.length)] + ".mp3";
-        audioDuck(1, duckFloat, "");
-        qa.play();
-        qa.addEventListener("ended", function (e) {
-            //            console.log("Quote playback ended");
-            audioDuck(0, duckFloat, e);
-            isAudioDucked = !isAudioDucked;
-        });
-    }
-}
-
-
 if (!Array.prototype.randomElement) {
     Array.prototype.randomElement = function () {
-        return this[Math.floor(Math.random() * this.length)]
-    };
+        return this[Math.floor(Math.random() * this.length)];
+    }
 }
 
 if (!Array.prototype.randomPop) {
@@ -275,8 +214,8 @@ var get_video = (function () {
 
     var played = [];
     var videos = [];
-
-    var youtube_video_regex = new RegExp(/^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*/);
+    //Thank you based regex gods https://github.com/regexhq/youtube-regex/blob/master/index.js
+    var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
     var get_api_call = function (time, sort) {
         return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
@@ -294,7 +233,7 @@ var get_video = (function () {
         }
         var groups = youtube_video_regex.exec(youtube_video_url);
         // TODO: Trim video id?
-        var video_id = groups[3]; // 3rd group is the video id.
+        var video_id = groups[1]; // 3rd group is the video id.
         if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
             return false;
         }
@@ -314,6 +253,11 @@ var get_video = (function () {
                     console.log("Ignored " + child.data.url);
                 }
             });
+            $('.container').removeClass('offline');
+            isRedditDown = false;
+        }).fail(function () {
+            $('.container').addClass('offline');
+            isRedditDown = true;
         });
     };
 
@@ -331,6 +275,70 @@ var get_video = (function () {
         return item;
     };
 })();
+
+var nextChannel = function () {
+
+    var changeChannelName = function () {
+        var channelName = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"].randomElement();
+
+        $("[data-channel-id]").attr("data-channel-id", channelName);
+    }
+
+    var playQuote = function () {
+        if (!isAudioDucked) {
+            isAudioDucked = !isAudioDucked;
+            var duckFloat = 0.1;
+            console.log("Starting quote playing");
+            var audioQuote = ["sexsells", "improv", "relax", "billmurray"].randomElement();
+            qa.src = "audio/quotes/" + audioQuote + ".mp3";
+            player.setVolume(audioDuck(1, duckFloat, ""));
+            qa.play();
+            qa.addEventListener("ended", function (e) {
+                //            console.log("Quote playback ended");
+                player.setVolume(audioDuck(0, duckFloat, e));
+                isAudioDucked = !isAudioDucked;
+            });
+        }
+    }
+    var audioDuck = function (direction, value, eventData) {
+        //    console.log("Current volume level: " + player.getVolume());
+        if (eventData !== "") {
+            //        console.log("Removing ended event");
+            eventData.target.removeEventListener(eventData.type, function () {});
+        }
+        var playerVolume = player.getVolume();
+        //A direction Value of 1 ducks, whereas a value of 0 reverts
+        if (direction) {
+            return playerVolume * value;;
+        } else {
+            return playerVolume / value;;
+        }
+    }
+
+
+    var switchChannel = function () {
+        if (isTVOn) {
+            if (Math.random() <= 0.1) {
+                setTimeout(playQuote(), 200);
+            }
+            clearTimeout(autoChannelDelay);
+            console.log("Timeout Removed on channel change!");
+            player.loadVideoById(get_video());
+            cha.play();
+            console.log("Channel Changed!");
+            changeChannelName();
+            $('#yt-contain').addClass("reset");
+            setTimeout(function () {
+                $('#yt-contain').removeClass("reset");
+            }, 200);
+            isNextSet = false;
+        }
+    }
+    return function () {
+        switchChannel();
+        changeChannelName();
+    }
+}();
 
 $(function () {
     bgv = document.getElementById("rick-bg");
