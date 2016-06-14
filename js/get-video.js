@@ -14,7 +14,7 @@ var qa;
 var delay;
 var autoChannelDelay;
 
-function triggerAnimation(callback) {
+function triggerAnimation(callback, param = "") {
     var actionDelay;
     var animationDelay = bgv.duration * 1000;
     if (!isAnimationPlaying) {
@@ -26,7 +26,11 @@ function triggerAnimation(callback) {
         delay = (bgv.duration * 1000) - 800;
         clearTimeout(actionDelay);
         actionDelay = setTimeout(function () {
-            callback();
+            if (param != "") {
+                callback(param);
+            } else {
+                callback();
+            }
         }, delay);
     }
 }
@@ -36,6 +40,7 @@ function turnOnOffTV() {
         isTVOn = !isTVOn;
         $('body').toggleClass('tv-on');
         $('body').removeClass('tv-off');
+        $('.volume').attr('data-volume', tvAudioLevel);
         if (!isRedditDown) {
             player = new YT.Player('yt-iframe', {
                 width: 1280,
@@ -60,7 +65,6 @@ function turnOnOffTV() {
         if (isTVMuted) {
             $('.container').addClass('mute');
         }
-        changeChannelName();
 
     } else if (isTVOn) {
         clearTimeout(autoChannelDelay);
@@ -87,8 +91,8 @@ function turnOnOffTV() {
 function onPlayerError() {
     console.error('Error Loading Video, Changing channel in 2 seconds');
     autoChannelDelay = setTimeout(function () {
-        triggerAnimation(nextChannel);
-    }, 2000);
+        triggerAnimation(nextChannel, false);
+    }, 1000);
 }
 
 function onPlayerReady(event) {
@@ -96,7 +100,6 @@ function onPlayerReady(event) {
         player.mute();
     }
     event.target.setVolume(tvAudioLevel);
-
     animationCssReset("#yt-contain");
     console.log("Player Ready!");
 }
@@ -125,11 +128,11 @@ function onPlayerStateChange(event) {
     }
 }
 
-function animationCssReset(selector){
+function animationCssReset(selector) {
     $(selector).addClass("reset-animation");
-            setTimeout(function () {
-                $(selector).removeClass("reset-animation");
-            }, 200);
+    setTimeout(function () {
+        $(selector).removeClass("reset-animation");
+    }, 200);
 }
 
 function volumeUp() {
@@ -167,14 +170,16 @@ function mute() {
     if (isTVOn && !isAudioDucked) {
         if (!isTVMuted) {
             player.mute();
+            //            if (tvAudioLevel === 0){
+            //                tvAudioLevel += 10;
+            //            }
             $('.container').addClass('mute');
-            isTVMuted = !isTVMuted;
         } else {
             player.unMute();
             $('.container').removeClass('mute');
             animationCssReset(".volume");
-            isTVMuted = !isTVMuted;
         }
+        isTVMuted = !isTVMuted;
     }
 }
 
@@ -184,9 +189,9 @@ function zoomToggle() {
 
 function menuToggle() {
     if (isTVOn) {
+        $('.container').toggleClass('menu-overlay');
         isMenuOpen = !isMenuOpen;
     }
-    $('.container').toggleClass('menu-overlay');
 }
 
 
@@ -217,20 +222,25 @@ var get_video = (function () {
     var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
     var get_api_call = function (time, sort) {
-        return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
+        return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
     };
 
-    var add_youtube_url = function (youtube_video_url) {
+    var add_youtube_url = function (reddit_post_data) {
         // Check if the URL is for youtube
-        if (!youtube_video_regex.test(youtube_video_url)) {
+        if (!youtube_video_regex.test(reddit_post_data.url)) {
             return false;
         }
         // Check to see if the entier video is being linked.
         // If a certain index is being linked, ignore the video.
-        if (youtube_video_url.indexOf("&t=") != -1) {
+        if (reddit_post_data.url.indexOf("t=") != -1) {
             return false;
         }
-        var groups = youtube_video_regex.exec(youtube_video_url);
+        // Check if a reddit post has less than 1 point.
+        // If the post does, ignore it. It is unworthy.
+        if (reddit_post_data.score < 1) {
+            return false;
+        }
+        var groups = youtube_video_regex.exec(reddit_post_data.url);
         // TODO: Trim video id?
         var video_id = groups[1]; // 3rd group is the video id.
         if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
@@ -246,7 +256,7 @@ var get_video = (function () {
         var url = get_api_call(time, sort);
         $.getJSON(url, function (data) {
             data.data.children.forEach(function (child) {
-                if (add_youtube_url(child.data.url)) {
+                if (add_youtube_url(child.data)) {
                     console.log("Added " + child.data.url);
                 } else {
                     console.log("Ignored " + child.data.url);
@@ -275,7 +285,24 @@ var get_video = (function () {
     };
 })();
 
-var nextChannel = function () {
+var nextChannel = function (noError = true) {
+
+    var pushShow = function () {
+        //Code here to push a new list item to the shows container in the HTML, which lists the image of the show, title, and links ot the youtube page.
+        var videoInfo = player.getVideoData();
+        var videoUrl = player.getVideoUrl();
+        var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
+        var listNode = $("#list-template li").clone();
+        listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
+        listNode.find(".video-title").html(videoInfo.title);
+        listNode.find(".video-author").html(videoInfo.author);
+        listNode.find("a").attr({
+            "href": videoUrl,
+            "target": "_blank",
+            title: videoInfo.title
+        });
+        listNode.prependTo(".shows");
+    }
 
     var changeChannelName = function () {
         var channelName = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"].randomElement();
@@ -285,24 +312,24 @@ var nextChannel = function () {
 
     var playQuote = function () {
         if (!isAudioDucked) {
-            isAudioDucked = !isAudioDucked;
+            isAudioDucked = true;
             var duckFloat = 0.1;
             console.log("Starting quote playing");
-            var audioQuote = ["sexsells", "improv", "relax", "billmurray"].randomElement();
+            var audioQuote = ["sexsells", "improv", "relax", "billmurray", "movie"].randomElement();
             qa.src = "audio/quotes/" + audioQuote + ".mp3";
-            player.setVolume(audioDuck(1, duckFloat, ""));
-            qa.play();
+            player.setVolume(audioDuck(1, duckFloat));
             qa.addEventListener("ended", function (e) {
-                //            console.log("Quote playback ended");
+                console.log("Quote playback ended");
                 player.setVolume(audioDuck(0, duckFloat, e));
-                isAudioDucked = !isAudioDucked;
+                isAudioDucked = false;
             });
+            qa.play();
         }
     }
-    var audioDuck = function (direction, value, eventData) {
+    var audioDuck = function (direction, value, eventData = "") {
         //    console.log("Current volume level: " + player.getVolume());
         if (eventData !== "") {
-            //        console.log("Removing ended event");
+            console.log("Removing ended event");
             eventData.target.removeEventListener(eventData.type, function () {});
         }
         var playerVolume = player.getVolume();
@@ -331,6 +358,9 @@ var nextChannel = function () {
         }
     }
     return function () {
+        if (noError) {
+            pushShow();
+        }
         switchChannel();
         changeChannelName();
     }
@@ -341,5 +371,38 @@ $(function () {
     bga = document.getElementById("off-audio");
     cha = document.getElementById("switch-audio");
     qa = document.getElementById("quote-player");
-
+    $("#video-url").on({
+        "mouseenter": function () {
+            if (isTVOn) {
+                $(this).attr({
+                    "href": player.getVideoUrl(),
+                    "target": "_blank"
+                });
+            }
+        },
+        "mouseleave": function () {
+            $(this).attr("href", "#");
+        }
+    });
+    $("#power").on("click", function () {
+        triggerAnimation(turnOnOffTV);
+    });
+    $("#zoom").on("click", function () {
+        triggerAnimation(zoomToggle);
+    });
+    $("#menu").on("click", function () {
+        triggerAnimation(menuToggle);
+    });
+    $("#mute").on("click", function () {
+        triggerAnimation(menuToggle);
+    });
+    $("#channel-up").on("click", function () {
+        triggerAnimation(nextChannel, true);
+    });
+    $("#volume-up").on("click", function () {
+        triggerAnimation(volumeUp);
+    });
+    $("#volume-down").on("click", function () {
+        triggerAnimation(volumeDown);
+    });
 });

@@ -22,18 +22,63 @@ TODO: Opengraph meta data to make things look nice when finished
     <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.2/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet" type="text/css">
+    <meta property="og:title" content="Inter-Dimensional Cable" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A non-stop stream of intergalactic content from /r/InterdimensionalCable straight to your eyeholes." />
+    <meta property="og:url" content="http://inter-dimensionalcable.xyz" />
+    <meta property="og:image" content="http://inter-dimensionalcable.xyz/images/opengraph.png" />
+    <meta property="og:image:width" content="499" />
+    <meta property="og:image:height" content="279" />
+    <!--  Twitter Cards  -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@MrMcPowned">
+    <meta name="twitter:creator" content="@MrMcPowned">
+    <meta name="twitter:title" content="Inter-Dimensional Cable">
+    <meta name="twitter:description" content="A non-stop stream of intergalactic content from /r/InterdimensionalCable straight to your eyeholes.">
+    <meta name="twitter:image" content="http://inter-dimensionalcable.xyz/images/opengraph.png">
 </head>
 
-<body>
-    <div class="remote">
-        <button onclick="triggerAnimation(turnOnOffTV)">Turn On/Off Tv</button>
-        <button onclick="triggerAnimation(zoomToggle)">Zoom In/Out</button>
-        <button onclick="triggerAnimation(nextChannel)">Next Channel</button>
-        <button onclick="triggerAnimation(volumeUp)">Volume Up</button>
-        <button onclick="triggerAnimation(volumeDown)">Volume Down</button>
-        <button onclick="triggerAnimation(mute)">Mute</button>
-        <button onclick="triggerAnimation(menuToggle)">Menu</button>
-        <button onclick="triggerAnimation(openVideo)">Open Video</button>
+<body class="tv-off">
+    <div class="remote-area">
+        <div class="tips">
+            <ul>
+                <li><b>Power Button</b>: Turns TV On/Off</li>
+                <li><b>Zoom</b>: Zooms the TV in or out for a better view</li>
+                <li><b>CH UP</b>: Changes the channel</li>
+                <li><b>VOL UP/DOWN</b>: Adjusts the TV's volume</li>
+                <li><b>UP/DOWN Arrows</b>: Votes for the post on /r/InterdimensionalCable</li>
+                <li><b>OK</b>: Opens the current video's URL in a new tab</li>
+                <li><b>MUTE</b>: Mutes the TV's audio</li>
+                <li><b>NO SIGNAL</b>: Reddit's API is down, Turn your TV On and Off again to see if the signal is back.</li>
+            </ul>
+        </div>
+        <div class="remote">
+            <div class="top-row">
+                <span class="button red" id="power">Pwr</span>
+                <span class="button" id="zoom">Zoom</span>
+            </div>
+            <div class="matrix">
+                <span class="button">1</span>
+                <span class="button">2</span>
+                <span class="button">3</span>
+                <span class="button">4</span>
+                <span class="button">5</span>
+                <span class="button">6</span>
+                <span class="button">7</span>
+                <span class="button">8</span>
+                <span class="button">9</span>
+                <span class="button" id="menu">Menu</span>
+                <span class="button">0</span>
+                <span class="button" id="mute">Mute</span>
+            </div>
+            <div class="bottom">
+                <span class="button wide" id="channel-up">CH +</span>
+                <span class="button large" id="volume-down"><span>VOL<br/>-</span></span>
+                <a href="#" class="button center red" id="video-url">OK</a>
+                <span class="button large" id="volume-up"><span>VOL<br/>+</span></span>
+                <span class="button wide"></span>
+            </div>
+        </div>
     </div>
     <div class="container">
         <!--        <img src="images/Rick-morty-tv.png" alt="Rick and Morty TV Background" class="rick-bg">-->
@@ -60,15 +105,23 @@ TODO: Opengraph meta data to make things look nice when finished
                     <div class="right">
                         <h1>Menu - MrMcTV v1.0</h1>
                         <p><i>A non-stop stream of intergalactic content from <a href="https://reddit.com/r/InterdimensionalCable">/r/InterdimensionalCable</a> straight to your eyeholes.</i></p>
-                        <ul>
-                            <li><b>Power Button</b>: Turns TV On/Off</li>
-                            <li><b>Zoom</b>: Zooms the TV in or out for a better view</li>
-                            <li><b>CH UP</b>: Changes the channel</li>
-                            <li><b>VOL UP/DOWN</b>: Adjusts the TV's volume</li>
-                            <li><b>UP/DOWN Arrows</b>: Votes for the post on /r/InterdimensionalCable</li>
-                            <li><b>OK</b>: Opens the current video's URL in a new tab</li>
-                            <li><b>MUTE</b>: Mutes the TV's audio</li>
-                            <li><b>NO SIGNAL</b>: Reddit's API is down, Turn your TV On and Off again to see if the signal is back.</li>
+                        <h2>Past Shows</h2>
+                        <div id="list-template">
+                            <li>
+                                <a href="">
+                                    <div>
+                                        <div class="poster">
+                                            <div></div>
+                                        </div>
+                                        <div class="video-info">
+                                            <span class="video-title"></span>
+                                            <span class="video-author"></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </div>
+                        <ul class="shows">
                         </ul>
                     </div>
                 </div>
@@ -84,7 +137,8 @@ TODO: Opengraph meta data to make things look nice when finished
         b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window)) ? ' touch' : '');
         //I'm lazy and don't wanna set target="_blank" on all those links
         var thisSite = window.location.hostname;
-        $('a[href^="http://"], a[href^="https://"]').not('a[href^="http://' + thisSite + '"], a[href^="https://' + thisSite + '"]').attr('target','_blank');
+        $('a[href^="http://"], a[href^="https://"]').not('a[href^="http://' + thisSite + '"], a[href^="https://' + thisSite + '"]').attr('target', '_blank');
+
     </script>
 
 </body>

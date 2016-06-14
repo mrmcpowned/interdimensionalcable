@@ -1,3 +1,7 @@
+:root{
+    --scale-ratio: 1.811624;
+}
+
 @keyframes channel-display {
     0% {
         opacity: 1;
@@ -53,9 +57,12 @@
         border-radius: 100%;
     }
 }
-h1 {
+h1, h2{
     margin: 0 0 .4vw 0;
     font-size: 1.6vw;
+}
+h2{
+    font-size: 1.25vw;
 }
 .contents .left,
 .contents .right {
@@ -80,18 +87,23 @@ ul li {
     list-style-position: inside;
     margin: 0 0 .3vw 0;
 }
-.zoom h1 {
-    font-size: calc(1.6vw * 1.811624);
+.zoom h1, .zoom h2 {
+    margin: 0 0 calc(.4vw * var(--scale-ratio)) 0;
+    font-size: calc(1.6vw * var(--scale-ratio));
+}
+.zoom h2 {
+    margin: 0 0 calc(.4vw * var(--scale-ratio)) 0;
+    font-size: calc(1.25vw * var(--scale-ratio));
 }
 .zoom .contents .left,
 .zoom .contents .right {
-    font-size: calc(.85vw * 1.811624);
+    font-size: calc(.85vw * var(--scale-ratio));
 }
 .zoom p {
-    margin: 0 0 calc(.5vw * 1.811624) 0;
+    margin: 0 0 calc(.5vw * var(--scale-ratio)) 0;
 }
 .zoom ul li {
-    margin: 0 0 calc(.3vw * 1.811624) 0;
+    margin: 0 0 calc(.3vw * var(--scale-ratio)) 0;
 }
 .container {
     width: 100%;
@@ -101,7 +113,7 @@ ul li {
     transform-origin: 53.9% 39.3%;
 }
 .zoom {
-    transform: scale(1.811624);
+    transform: scale(var(--scale-ratio));
 }
 .rick-bg {
     width: 100%;
@@ -161,8 +173,8 @@ html[data-useragent*=Firefox] #video:before {
 }
 
 .tv-on .zoom.offline .cover.static:after{
-    font-size: calc(3vw * 1.811624);
-    padding: calc(.4vw * 1.811624)
+    font-size: calc(3vw * var(--scale-ratio));
+    padding: calc(.4vw * var(--scale-ratio))
 }
 
 #video {
@@ -261,17 +273,17 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     animation: none;
 }
 .zoom.mute .channel:before {
-    font-size: calc(2.4vw * 1.811624);
+    font-size: calc(2.4vw * var(--scale-ratio));
 }
 .zoom #yt-contain:after {
-    font-size: calc(1.88vw * 1.811624);
+    font-size: calc(1.88vw * var(--scale-ratio));
 }
 .menu-overlay #yt-contain {
     transform: scale(.41);
     border: 6px solid white;
 }
 .zoom .menu-overlay #yt-contain {
-    border: calc(6px * 1.811624) solid white;
+    border: calc(6px * var(--scale-ratio)) solid white;
 }
 
 .volume:after{
@@ -290,8 +302,8 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 }
 
 .zoom .volume:after{
-    font-size: calc(3vw * 1.811624);
-    bottom: calc(1vw * 1.811624);
+    font-size: calc(3vw * var(--scale-ratio));
+    bottom: calc(1vw * var(--scale-ratio));
 }
 .volume.reset-animation:after {
     animation: volume-reset .1s forwards;
@@ -383,8 +395,8 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     margin-top: 11vw;
 }
 .zoom .tv-menu .left {
-    margin-left: calc(1.1vw * 1.811624);
-    margin-top: calc(11vw * 1.811624);
+    margin-left: calc(1.1vw * var(--scale-ratio));
+    margin-top: calc(11vw * var(--scale-ratio));
 }
 .tv-menu .right {
     width: 51%;
@@ -394,8 +406,82 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     margin-top: 1.3vw;
 }
 .zoom .tv-menu .right {
-    margin-right: calc(1.1vw * 1.811624);
-    margin-top: calc(1.3vw * 1.811624);
+    margin-right: calc(1.1vw * var(--scale-ratio));
+    margin-top: calc(1.3vw * var(--scale-ratio));
+}
+#list-template{
+    display: none;
+}
+.shows{
+    display: flex;
+    flex-direction: column;
+    height: 10.5vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.zoom .shows{
+    height: calc(10.5vw * var(--scale-ratio));
+}
+.shows li, .zoom .shows li{
+    padding: 0;
+    margin: 0;
+}
+.shows li a{
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 2.3vw;
+    padding: 4px 0 4px 4px;
+}
+.zoom .shows li a{
+    height: calc(2.3vw * var(--scale-ratio));
+    padding: calc(4px * var(--scale-ratio)) 0 calc(4px * var(--scale-ratio)) calc(4px * var(--scale-ratio)) 
+}
+.shows li a:hover{
+    background: rgba(255,255,255,.3)
+}
+.shows a > div{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start
+}
+.shows .poster{
+    width: 4vw;
+    margin-right: .5vw;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.zoom .shows .poster{
+    width: calc(4vw * var(--scale-ratio));
+    margin-right: calc(.5vw * var(--scale-ratio))
+}
+.shows .poster div{
+    width: 100%;
+    padding-bottom: 56.25%;
+    background-size: cover;
+}
+.shows li span{
+    display: block;
+}
+.shows .video-info{
+    max-width: 13.1vw;
+    flex-grow: 0;
+}
+.zoom .shows .video-info{
+    max-width: calc(13.1vw * var(--scale-ratio))
+}
+.shows .video-title{
+    font-size: 1vw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+}
+.zoom .shows .video-title{
+    font-size: calc(1vw * var(--scale-ratio))
+}
+.shows .video-author{
+    font-style: italic;
 }
 .remote.test {
     position: fixed;
@@ -409,28 +495,58 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     z-index: 5;
     bottom: -325px;
     right: 20px;
-    transition: .24s ease-out;
+    transition: .24s ease-out 1s;
 }
-.remote-area:hover{
+.tv-on .remote-area{
+    bottom: -360px;
+}
+.tv-on .remote-area:hover{
     bottom: -50px;
+    transition: .24s ease-out;    
 }
 .tips{
     position: absolute;
     display: block;
-    right: 105%;
     width: 120%;
+    right: -15%;
     background: #f2f2f2;
     padding: 10px;
     z-index: -2;
-    
-/*    border-radius: 4% 0% 0 0 / 5% 0% 0 0;*/
-
+    -webkit-clip-path: inset(0% 20px 0% 0%);
+    clip-path: inset(0% 20px 0% 0%);
+    transition: .24s ease-out;
+}
+.tips:before {
+    content: "";
+    display: block;
+    height: 100%;
+    width: 20px;
+    position: absolute;
+    left: -20px;
+    top: 0;
+}
+.tips:after {
+    content: "";
+    width: 100%;
+    height: 40px;
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+}
+.tips:hover, .tv-off .tips{
+    right: 105%;
+    -webkit-clip-path: inset(0% 0 0% 0%);
+    clip-path: inset(0% 0 0% 0%);
 }
 
-.remote .top-row, .remote .matrix{
+.remote .top-row, .remote .matrix, .remote .bottom{
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap
+}
+.remote .bottom{
+    justify-content: space-around;
+    align-items: center
 }
 .remote .top-row{
     margin-bottom: 15px;
@@ -473,6 +589,35 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 .button[id]:active{
     filter: invert(.7);
     -webkit-filter: invert(.7);
+}
+.button.wide{
+    width: 120px;
+    height: 35px;
+    margin: 0 10px;
+    line-height: 35px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.button.large{
+    height: 85px;
+    min-width: 35px;
+    flex-flow: 0;
+    flex-shrink: 0;
+    line-height: 20px;
+    position: relative;
+    display: block;
+}
+.button.large span{
+    position: relative;
+    top: 50%;
+    display: inline-block;
+    transform: translateY(-50%);
+}
+.button.center{
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-decoration: none;
 }
 .remote-area .remote:after{
     content: "";
