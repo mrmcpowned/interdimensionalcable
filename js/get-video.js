@@ -76,7 +76,7 @@ function turnOnOffTV() {
         }
         if (!isRedditDown) player.destroy();
         bga.play();
-        isNextSet = !isNextSet;
+        isNextSet = false;
         isTVOn = !isTVOn;
     }
 }
@@ -394,7 +394,7 @@ $(function () {
         triggerAnimation(menuToggle);
     });
     $("#mute").on("click", function () {
-        triggerAnimation(menuToggle);
+        triggerAnimation(mute);
     });
     $("#channel-up").on("click", function () {
         triggerAnimation(nextChannel, true);
