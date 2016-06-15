@@ -52,14 +52,15 @@ $(function () {
 			}
 			var groups = youtube_video_regex.exec(reddit_post_data.url);
 			// TODO: Trim video id?
-			var video_id = groups[1]; // 3rd group is the video id.
-			if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
+			var video_id = groups[1]; // 2nd group is the video id.
+			if (played.indexOf(video_id) != -1) {
 				return false;
 			}
 			videos.push({
 				"video": video_id,
 				"link": `https://www.reddit.com${reddit_post_data.permalink}`
 			});
+            		played.push(video_id);
 			return true;
 		};
 
