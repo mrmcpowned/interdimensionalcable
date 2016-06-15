@@ -56,7 +56,10 @@ $(function () {
 			if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
 				return false;
 			}
-			videos.push(video_id);
+			videos.push({
+				"video": video_id,
+				"link": `https://www.reddit.com${reddit_post_data.permalink}`
+			});
 			return true;
 		};
 
@@ -82,7 +85,7 @@ $(function () {
 
 		load_videos();
 
-		return function () {
+		var get_next_video = function () {
 			// We ran out of videos
 			// Reddit is likely off
 			if (videos.length == 0) {
@@ -94,6 +97,8 @@ $(function () {
 			}
 			return videos.randomPop();
 		};
+
+		return get_next_video;
 	})();
 
 	var sound_effect = (function () {
@@ -246,7 +251,7 @@ $(function () {
 	};
 
 
-	var channel_manager = function (player, play_clip) {
+	var channel_manager = function (player, handle_get_next_video, play_clip) {
 		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
 
@@ -265,7 +270,7 @@ $(function () {
 			// Set channel name
 			$("[data-channel-id]").attr("data-channel-id", channel_names.randomPop());
 
-			var video = get_next_video();
+			var video = handle_get_next_video();
 
 			// Display to the user that we ran out of video
 			// This is probably from Reddit not responding to API requests.
@@ -291,6 +296,15 @@ $(function () {
 
 		var player = null;
 		var player_switch_handler = 0;
+
+		var handle_get_next_video = function () {
+			var next_data = get_next_video();
+			$("#video-url").attr({
+				"href": next_data.link,
+				"target": "_blank"
+			});
+			return next_data.video;
+		};
 
 		var toggle_tv_classes = function () {
 			$("body").toggleClass("tv-on");
@@ -326,23 +340,10 @@ $(function () {
 			$("#volume-up").on("click", animate_callback(volume_up));
 			$("#volume-down").on("click", animate_callback(volume_down));
 
-			var next_channel = channel_manager(player, play_clip);
+			var next_channel = channel_manager(player, handle_get_next_video, play_clip);
 
 			// Move to the next channel
 			$("#channel-up").on("click", animate_callback(sound_effect(next_channel, "switch")));
-
-			// Open current video in new tab
-			$("#video-url").on({
-				"mouseenter": function () {
-					$(this).attr({
-						"href": player.getVideoUrl(),
-						"target": "_blank"
-					});
-				},
-				"mouseleave": function () {
-					$(this).attr("href", "#");
-				}
-			});
 
 			$("#menu").on("click", animate_callback(function () {
 				$('.container').toggleClass('menu-overlay');
@@ -388,7 +389,7 @@ $(function () {
 			return new YT.Player("yt-iframe", {
 				width: 1280,
 				height: 720,
-				videoId: get_next_video(),
+				videoId: handle_get_next_video(),
 				playerVars: {
 					"autoplay": 1,
 					"controls": 0,
