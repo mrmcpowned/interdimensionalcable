@@ -45,9 +45,9 @@ $(function () {
 			if (reddit_post_data.url.indexOf("t=") != -1) {
 				return false;
 			}
-			// Check if a reddit post has less than 1 point.
+			// Check if a reddit post has less than 25 points.
 			// If the post does, ignore it. It is unworthy.
-			if (reddit_post_data.score < 1) {
+			if (reddit_post_data.score < 25) {
 				return false;
 			}
 			var groups = youtube_video_regex.exec(reddit_post_data.url);
