@@ -251,7 +251,6 @@ $(function () {
 
 	};
 
-
 	var channel_manager = function (player, get_next_video, play_clip) {
 		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
@@ -298,6 +297,27 @@ $(function () {
 		var player = null;
 		var player_switch_handler = 0;
 
+		var add_current_channel = function () {
+
+			var videoInfo = player.getVideoData();
+			var videoUrl = player.getVideoUrl();
+
+			var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
+
+			var listNode = $("#list-template li").clone();
+
+			listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
+			listNode.find(".video-title").text(videoInfo.title);
+			listNode.find(".video-author").text(videoInfo.author);
+
+			listNode.find("a").attr({
+				"href": videoUrl,
+				"target": "_blank",
+				title: videoInfo.title
+			});
+			listNode.prependTo(".shows");
+		}
+
 		var get_next_video = function () {
 			var post = get_next_post();
 			$("#video-url").attr({
@@ -312,27 +332,6 @@ $(function () {
 			$("body").toggleClass("tv-off");
 		};
 
-		var add_current_channel = function () {
-
-			var videoInfo = player.getVideoData();
-			var videoUrl = player.getVideoUrl();
-
-			var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
-
-			var listNode = $("#list-template li").clone();
-
-			listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
-			listNode.find(".video-title").text(videoInfo.title);
-			listNode.find(".video-author").text(videoInfo.author);
-			listNode.find("a").attr({
-				"href": videoUrl,
-				"target": "_blank",
-				title: videoInfo.title
-			});
-
-			listNode.prependTo(".shows");
-		}
-
 		var on_ready = function (event) {
 			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
 
@@ -344,7 +343,12 @@ $(function () {
 			var next_channel = channel_manager(player, get_next_video, play_clip);
 
 			// Move to the next channel
-			$("#channel-up").on("click", animate_callback(sound_effect(next_channel, "switch")));
+			$("#channel-up").on("click", animate_callback(sound_effect(function () {
+				if (!isNaN(player.getDuration())) {
+					add_current_channel();
+				}
+				next_channel();
+			}, "switch")));
 
 			$("#menu").on("click", animate_callback(function () {
 				$('.container').toggleClass('menu-overlay');
@@ -359,11 +363,13 @@ $(function () {
 				case YT.PlayerState.ENDED:
 					var last_url = player.getVideoUrl();
 					setTimeout(function () {
+						if (player_switch_handler == null) {
+							return;
+						}
 						if (last_url !== player.getVideoUrl()) {
 							return;
 						}
 						console.log("ENDED event");
-						add_current_channel();
 						$("#channel-up").click();
 					}, 50);
 					return;
@@ -371,8 +377,8 @@ $(function () {
 					clearTimeout(player_switch_handler);
 					player_switch_handler = setTimeout(function () {
 						console.log("Running PLAYING event");
-						add_current_channel();
 						$("#channel-up").click();
+						player_switch_handler = null;
 					}, (player.getDuration() * 1000) - 900);
 					return;
 				case YT.PlayerState.PAUSED:
