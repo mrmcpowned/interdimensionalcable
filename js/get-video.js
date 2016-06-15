@@ -306,7 +306,7 @@ $(function () {
 
 			var listNode = $("#list-template li").clone();
 
- 			listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
+			listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
 			listNode.find(".video-title").text(videoInfo.title);
 			listNode.find(".video-author").text(videoInfo.author);
 
@@ -390,7 +390,6 @@ $(function () {
 		var on_error = function (event) {
 			console.log("On Error Event");
 			$("#channel-up").click();
-			error();
 		};
 
 		var create_player = function () {
