@@ -239,6 +239,8 @@ $(function () {
 
 		};
 
+		set_volume(50);
+
 		return [toggle_mute, volume_up, volume_down, play_clip].map(guard);
 
 	};
