@@ -1,408 +1,445 @@
-var isTVOn = false;
-var isTVMuted = false;
-var isMenuOpen = false;
-var isAudioDucked = false;
-var isAnimationPlaying = false;
-var tvAudioLevel = 50;
-var isNextSet = false;
-var isRedditDown = true;
-var player;
-var bgv;
-var bga;
-var cha;
-var qa;
-var delay;
-var autoChannelDelay;
-
-function triggerAnimation(callback, param = "") {
-    var actionDelay;
-    var animationDelay = bgv.duration * 1000;
-    if (!isAnimationPlaying) {
-        isAnimationPlaying = !isAnimationPlaying;
-        setTimeout(function () {
-            isAnimationPlaying = !isAnimationPlaying;
-        }, animationDelay + 300);
-        bgv.play();
-        delay = (bgv.duration * 1000) - 800;
-        clearTimeout(actionDelay);
-        actionDelay = setTimeout(function () {
-            if (param != "") {
-                callback(param);
-            } else {
-                callback();
-            }
-        }, delay);
-    }
-}
-
-function turnOnOffTV() {
-    if (!isTVOn) {
-        isTVOn = !isTVOn;
-        $('body').toggleClass('tv-on');
-        $('body').removeClass('tv-off');
-        $('.volume').attr('data-volume', tvAudioLevel);
-        if (!isRedditDown) {
-            player = new YT.Player('yt-iframe', {
-                width: 1280,
-                height: 720,
-                videoId: get_video(),
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 0,
-                    'showinfo': 0,
-                    'rel': 0,
-                    'iv_load_policy': 3,
-                    'disablekb': 1
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
-        }
-        cha.play();
-        if (isTVMuted) {
-            $('.container').addClass('mute');
-        }
-
-    } else if (isTVOn) {
-        clearTimeout(autoChannelDelay);
-        $('body').toggleClass('tv-on');
-        $('body').addClass('tv-off');
-        if (isMenuOpen) {
-            console.log('tv menu reset');
-            menuToggle();
-        }
-        if (!isRedditDown) player.destroy();
-        bga.play();
-        isNextSet = false;
-        isTVOn = !isTVOn;
-    }
-}
-
-
-//Decided against doing this to keep the gag as genuine as possible. The beauty lies in nto knowing what's going on until it's too late
-//function populateVideoInfo() {
-//    $('.info-bar .responsive').css({"background-image": "url(http://img.youtube.com/vi/" + player.getVideoData().video_id + "/1.jpg)"});
-//    $('.description p').text(player.getVideoData().title);
-//}
-
-function onPlayerError() {
-    console.error('Error Loading Video, Changing channel in 2 seconds');
-    autoChannelDelay = setTimeout(function () {
-        triggerAnimation(nextChannel, false);
-    }, 1000);
-}
-
-function onPlayerReady(event) {
-    if (isTVMuted) {
-        player.mute();
-    }
-    event.target.setVolume(tvAudioLevel);
-    animationCssReset("#yt-contain");
-    console.log("Player Ready!");
-}
-
-function onPlayerStateChange(event) {
-    switch (event.data) {
-        case YT.PlayerState.ENDED:
-            nextChannel();
-            break;
-        case YT.PlayerState.PLAYING:
-            if (!isNextSet) {
-                clearTimeout(autoChannelDelay);
-                var acdMS = player.getDuration() * 1000 - delay - 300;
-                autoChannelDelay = setTimeout(function () {
-                    console.log("Channel auto-changed!");
-                    triggerAnimation(nextChannel);
-                }, acdMS);
-                console.log("Timeout Set on state change!");
-                isNextSet = !isNextSet;
-            }
-            break;
-        case YT.PlayerState.PAUSED:
-            event.target.playVideo();
-            break;
-        default:
-    }
-}
-
-function animationCssReset(selector) {
-    $(selector).addClass("reset-animation");
-    setTimeout(function () {
-        $(selector).removeClass("reset-animation");
-    }, 200);
-}
-
-function volumeUp() {
-    if (isTVOn && !isAudioDucked) {
-        if (tvAudioLevel !== 100) {
-            tvAudioLevel += 10;
-            animationCssReset(".volume");
-            $('.volume').attr('data-volume', tvAudioLevel);
-        }
-        if (isTVMuted) {
-            console.log('Un Muted Audio on Volume Raise!');
-            mute();
-        }
-        player.setVolume(tvAudioLevel);
-        console.log("Volume Raised!");
-    }
-}
-
-function volumeDown() {
-    if (isTVOn && !isAudioDucked) {
-        if (tvAudioLevel === 10) {
-            tvAudioLevel -= 10;
-            mute();
-        } else if (tvAudioLevel > 10) {
-            tvAudioLevel -= 10;
-            animationCssReset(".volume");
-            $('.volume').attr('data-volume', tvAudioLevel);
-            player.setVolume(tvAudioLevel);
-            console.log("Volume Lowered!");
-        }
-    }
-}
-
-function mute() {
-    if (isTVOn && !isAudioDucked) {
-        if (!isTVMuted) {
-            player.mute();
-            //            if (tvAudioLevel === 0){
-            //                tvAudioLevel += 10;
-            //            }
-            $('.container').addClass('mute');
-        } else {
-            player.unMute();
-            $('.container').removeClass('mute');
-            animationCssReset(".volume");
-        }
-        isTVMuted = !isTVMuted;
-    }
-}
-
-function zoomToggle() {
-    $('.container').toggleClass('zoom');
-}
-
-function menuToggle() {
-    if (isTVOn) {
-        $('.container').toggleClass('menu-overlay');
-        isMenuOpen = !isMenuOpen;
-    }
-}
-
-
-function openVideo() {
-    if (isTVOn) {
-        window.open(player.getVideoUrl(), '_blank');
-    }
-}
 
 if (!Array.prototype.randomElement) {
-    Array.prototype.randomElement = function () {
-        return this[Math.floor(Math.random() * this.length)];
-    }
+	Array.prototype.randomElement = function () {
+		return this[Math.floor(Math.random() * this.length)];
+	};
 }
 
 if (!Array.prototype.randomPop) {
-    Array.prototype.randomPop = function () {
-        var index = Math.floor(Math.random() * this.length);
-        return this.splice(index, 1)[0];
-    };
+	Array.prototype.randomPop = function () {
+		var index = Math.floor(Math.random() * this.length);
+		return this.splice(index, 1)[0];
+	};
 }
 
-var get_video = (function () {
 
-    var played = [];
-    var videos = [];
-    //Thank you based regex gods https://github.com/regexhq/youtube-regex/blob/master/index.js
-    var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
+function animate_object(selector) {
 
-    var get_api_call = function (time, sort) {
-        return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
-    };
+	var reset = function () {
+		// TODO: Will this work?
+		$(selector).toggleClass("reset-animation");
+	};
 
-    var add_youtube_url = function (reddit_post_data) {
-        // Check if the URL is for youtube
-        if (!youtube_video_regex.test(reddit_post_data.url)) {
-            return false;
-        }
-        // Check to see if the entier video is being linked.
-        // If a certain index is being linked, ignore the video.
-        if (reddit_post_data.url.indexOf("t=") != -1) {
-            return false;
-        }
-        // Check if a reddit post has less than 1 point.
-        // If the post does, ignore it. It is unworthy.
-        if (reddit_post_data.score < 1) {
-            return false;
-        }
-        var groups = youtube_video_regex.exec(reddit_post_data.url);
-        // TODO: Trim video id?
-        var video_id = groups[1]; // 3rd group is the video id.
-        if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
-            return false;
-        }
-        videos.push(video_id);
-        return true;
-    };
-
-    var load_more = function () {
-        var time = ["week", "month", "year", "all"].randomElement();
-        var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
-        var url = get_api_call(time, sort);
-        $.getJSON(url, function (data) {
-            data.data.children.forEach(function (child) {
-                if (add_youtube_url(child.data)) {
-                    console.log("Added " + child.data.url);
-                } else {
-                    console.log("Ignored " + child.data.url);
-                }
-            });
-            $('.container').removeClass('offline');
-            isRedditDown = false;
-        }).fail(function () {
-            $('.container').addClass('offline');
-            isRedditDown = true;
-        });
-    };
-
-    load_more();
-
-    return function () {
-        if (videos.length < 5) {
-            if (videos.length == 0) {
-                return null;
-            }
-            load_more();
-        }
-        var item = videos.randomPop();
-        played.push(item);
-        return item;
-    };
-})();
-
-var nextChannel = function (noError = true) {
-
-    var pushShow = function () {
-        //Code here to push a new list item to the shows container in the HTML, which lists the image of the show, title, and links ot the youtube page.
-        var videoInfo = player.getVideoData();
-        var videoUrl = player.getVideoUrl();
-        var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
-        var listNode = $("#list-template li").clone();
-        listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
-        listNode.find(".video-title").html(videoInfo.title);
-        listNode.find(".video-author").html(videoInfo.author);
-        listNode.find("a").attr({
-            "href": videoUrl,
-            "target": "_blank",
-            title: videoInfo.title
-        });
-        listNode.prependTo(".shows");
-    }
-
-    var changeChannelName = function () {
-        var channelName = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"].randomElement();
-
-        $("[data-channel-id]").attr("data-channel-id", channelName);
-    }
-
-    var playQuote = function () {
-        if (!isAudioDucked) {
-            isAudioDucked = true;
-            var duckFloat = 0.1;
-            console.log("Starting quote playing");
-            var audioQuote = ["sexsells", "improv", "relax", "billmurray", "movie"].randomElement();
-            qa.src = "audio/quotes/" + audioQuote + ".mp3";
-            player.setVolume(audioDuck(1, duckFloat));
-            qa.addEventListener("ended", function (e) {
-                console.log("Quote playback ended");
-                player.setVolume(audioDuck(0, duckFloat, e));
-                isAudioDucked = false;
-            });
-            qa.play();
-        }
-    }
-    var audioDuck = function (direction, value, eventData = "") {
-        //    console.log("Current volume level: " + player.getVolume());
-        if (eventData !== "") {
-            console.log("Removing ended event");
-            eventData.target.removeEventListener(eventData.type, function () {});
-        }
-        var playerVolume = player.getVolume();
-        //A direction Value of 1 ducks, whereas a value of 0 reverts
-        if (direction) {
-            return playerVolume * value;;
-        } else {
-            return playerVolume / value;;
-        }
-    }
-
-
-    var switchChannel = function () {
-        if (isTVOn) {
-            if (Math.random() <= 0.1) {
-                setTimeout(playQuote(), 200);
-            }
-            clearTimeout(autoChannelDelay);
-            console.log("Timeout Removed on channel change!");
-            player.loadVideoById(get_video());
-            cha.play();
-            console.log("Channel Changed!");
-            changeChannelName();
-            animationCssReset("#yt-contain");
-            isNextSet = false;
-        }
-    }
-    return function () {
-        if (noError) {
-            pushShow();
-        }
-        switchChannel();
-        changeChannelName();
-    }
-}();
+	reset();
+	setTimeout(reset, 200);
+}
 
 $(function () {
-    bgv = document.getElementById("rick-bg");
-    bga = document.getElementById("off-audio");
-    cha = document.getElementById("switch-audio");
-    qa = document.getElementById("quote-player");
-    $("#video-url").on({
-        "mouseenter": function () {
-            if (isTVOn) {
-                $(this).attr({
-                    "href": player.getVideoUrl(),
-                    "target": "_blank"
-                });
-            }
-        },
-        "mouseleave": function () {
-            $(this).attr("href", "#");
-        }
-    });
-    $("#power").on("click", function () {
-        triggerAnimation(turnOnOffTV);
-    });
-    $("#zoom").on("click", function () {
-        triggerAnimation(zoomToggle);
-    });
-    $("#menu").on("click", function () {
-        triggerAnimation(menuToggle);
-    });
-    $("#mute").on("click", function () {
-        triggerAnimation(mute);
-    });
-    $("#channel-up").on("click", function () {
-        triggerAnimation(nextChannel, true);
-    });
-    $("#volume-up").on("click", function () {
-        triggerAnimation(volumeUp);
-    });
-    $("#volume-down").on("click", function () {
-        triggerAnimation(volumeDown);
-    });
+	var get_next_post = (function () {
+
+		var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
+
+		var videos = [], played = [];
+
+		var get_api_call = function (time, sort) {
+			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
+		};
+
+		var add_youtube_url = function (reddit_post_data) {
+			// Check if the URL is for youtube
+			if (!youtube_video_regex.test(reddit_post_data.url)) {
+				return false;
+			}
+			// Check to see if the entier video is being linked.
+			// If a certain index is being linked, ignore the video.
+			if (reddit_post_data.url.indexOf("t=") != -1) {
+				return false;
+			}
+			// Check if a reddit post has less than 1 point.
+			// If the post does, ignore it. It is unworthy.
+			if (reddit_post_data.score < 1) {
+				return false;
+			}
+			var groups = youtube_video_regex.exec(reddit_post_data.url);
+			// TODO: Trim video id?
+			var video_id = groups[1]; // 3rd group is the video id.
+			if (played.indexOf(video_id) != -1 || videos.indexOf(video_id) != -1) {
+				return false;
+			}
+			videos.push({
+				"video": video_id,
+				"link": `https://www.reddit.com${reddit_post_data.permalink}`
+			});
+			return true;
+		};
+
+
+
+		var load_posts = function () {
+			var time = ["week", "month", "year", "all"].randomElement();
+			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
+			var url = get_api_call(time, sort);
+			$.getJSON(url, function (api_response) {
+				api_response.data.children.forEach(function (child) {
+					if (add_youtube_url(child.data)) {
+						console.log("Added " + child.data.url);
+					} else {
+						console.log("Ignored " + child.data.url);
+					}
+				});
+			}).fail(function () {
+				// Re-Poll on timeout/parse failure
+				setTimeout(load_videos, 5000);
+			});
+		};
+
+		load_posts();
+
+		var get_next_post = function () {
+			// We ran out of videos
+			// Reddit is likely off
+			if (videos.length == 0) {
+				return null;
+			}
+			// We need to cache more videos
+			if (videos.length < 5) {
+				load_posts();
+			}
+			return videos.randomPop();
+		};
+
+		return get_next_post;
+	})();
+
+	var sound_effect = (function () {
+		var sounds = {
+			"off": document.getElementById("off-audio"),
+			"switch": document.getElementById("switch-audio"),
+		};
+		return function (callback, effect) {
+			var sound_effect = sounds[effect];
+			return function () {
+				sound_effect.play();
+				callback();
+			};
+		};
+	})();
+
+	var animation = (function () {
+
+		var background_animation = document.getElementById("rick-bg");
+		var crt_click = document.getElementById("off-audio");
+
+		var last_timeout_id = undefined;
+
+		return function (callback, external) {
+
+
+			var duration = background_animation.duration * 1000;
+
+			if (last_timeout_id !== undefined) {
+				console.log("Clearing last timeout");
+				clearTimeout(last_timeout_id);
+				//return false;
+			}
+
+			if (external === undefined) {
+				external = 0;
+			} else {
+				external -= 800;
+			}
+
+			var click_offset = duration - 800;
+
+			var arg_count = arguments.length;
+			var callback_args = Array.prototype.slice.call(arguments, 1, arg_count - 1);
+
+			setTimeout(function () {
+
+				background_animation.play();
+
+				last_time_id = setTimeout(function () {
+					callback.apply(this, callback_args);
+					last_time_id = undefined;
+				}, click_offset);
+
+			}, external);
+
+			return true;
+		};
+	})();
+
+
+	var animate_callback = function (callback) {
+		return function () {
+			if (animation(callback)) {
+				return;
+			}
+			callback();
+		};
+	};
+
+	var volume_controller = function (player) {
+
+		var playing_clip = false;
+		var quote_player = document.getElementById("quote-player");
+
+		var guard = function (other) {
+			return function () {
+				if (playing_clip) {
+					return;
+				}
+				other.apply(this, arguments);
+			}
+		};
+
+		var toggle_mute = function () {
+			if (player.isMuted()) {
+				player.unMute();
+				animate_object(".volume");
+			} else {
+				player.mute();
+			}
+			$(".container").toggleClass("mute");
+		};
+
+		var set_volume = function (volume) {
+			$(".volume").attr("data-volume", volume);
+			animate_object(".volume");
+			player.setVolume(volume);
+		};
+
+		var volume_up = function () {
+
+			if (player.getVolume() == 100) {
+				return;
+			}
+
+			if (player.isMuted()) {
+				// Unmute the player
+				toggle_mute();
+			}
+
+			set_volume(player.getVolume() + 10);
+		};
+
+		var volume_down = function () {
+
+			if (player.getVolume() == 0) {
+				return;
+			}
+
+			set_volume(player.getVolume() - 10);
+
+			if (player.getVolume() == 0) {
+				toggle_mute();
+			}
+
+		};
+
+		var play_clip = function (audio_clip) {
+
+			var initial_volume = player.getVolume();
+			var ducked_volume = initial_volume / 10;
+
+			player.setVolume(ducked_volume);
+
+			quote_player.src = audio_clip;
+
+			quote_player.addEventListener("ended", function (e) {
+				player.setVolume(initial_volume);
+			});
+
+			quote_player.play();
+
+		};
+
+		set_volume(50);
+
+		return [toggle_mute, volume_up, volume_down, play_clip].map(guard);
+
+	};
+
+
+	var channel_manager = function (player, get_next_video, play_clip) {
+		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
+		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
+
+		var handle_quote = function () {
+
+			// Only allow 10% of cases into this function
+			if (Math.random() > .1) {
+				return;
+			}
+			var clip_name = `audio/quotes/${quotes.randomPop()}.mp3`;
+			play_clip(clip_name);
+
+		};
+
+		var next_channel = function () {
+			// Set channel name
+			$("[data-channel-id]").attr("data-channel-id", channel_names.randomPop());
+
+			var video = get_next_video();
+
+			// Display to the user that we ran out of video
+			// This is probably from Reddit not responding to API requests.
+			if (video === null) {
+				$('.container').addClass('offline');
+				var with_sound = sound_effect(next_channel, "switch");
+				setTimeout(animate_callback(with_sound), 1000);
+				return;
+			}
+
+			$('.container').removeClass('offline');
+
+			handle_quote();
+
+			player.loadVideoById(video);
+
+		};
+
+		return next_channel;
+	};
+
+	var tv_toggle = (function () {
+
+		var player = null;
+		var player_switch_handler = 0;
+
+		var get_next_video = function () {
+			var post = get_next_post();
+			$("#video-url").attr({
+				"href": post.link,
+				"target": "_blank"
+			});
+			return post.video;
+		};
+
+		var toggle_tv_classes = function () {
+			$("body").toggleClass("tv-on");
+			$("body").toggleClass("tv-off");
+		};
+
+		var add_current_channel = function () {
+
+			var videoInfo = player.getVideoData();
+			var videoUrl = player.getVideoUrl();
+
+			var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
+
+			var listNode = $("#list-template li").clone();
+
+			listNode.find(".poster div").css("background-image", `url(${imgUrl})`);
+			listNode.find(".video-title").text(videoInfo.title);
+			listNode.find(".video-author").text(videoInfo.author);
+			listNode.find("a").attr({
+				"href": videoUrl,
+				"target": "_blank",
+				title: videoInfo.title
+			});
+
+			listNode.prependTo(".shows");
+		}
+
+		var on_ready = function (event) {
+			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+
+			// Volume control
+			$("#mute").on("click", animate_callback(toggle_mute));
+			$("#volume-up").on("click", animate_callback(volume_up));
+			$("#volume-down").on("click", animate_callback(volume_down));
+
+			var next_channel = channel_manager(player, get_next_video, play_clip);
+
+			// Move to the next channel
+			$("#channel-up").on("click", animate_callback(sound_effect(next_channel, "switch")));
+
+			$("#menu").on("click", animate_callback(function () {
+				$('.container').toggleClass('menu-overlay');
+			}));
+
+			// Start the set of videos
+			//$("#channel-up").click();
+		};
+
+		var on_state_change = function (event) {
+			switch (event.data) {
+				case YT.PlayerState.ENDED:
+					var last_url = player.getVideoUrl();
+					setTimeout(function () {
+						if (last_url !== player.getVideoUrl()) {
+							return;
+						}
+						console.log("ENDED event");
+						add_current_channel();
+						$("#channel-up").click();
+					}, 50);
+					return;
+				case YT.PlayerState.PLAYING:
+					clearTimeout(player_switch_handler);
+					player_switch_handler = setTimeout(function () {
+						console.log("Running PLAYING event");
+						add_current_channel();
+						$("#channel-up").click();
+					}, (player.getDuration() * 1000) - 900);
+					return;
+				case YT.PlayerState.PAUSED:
+					event.target.playVideo();
+					return;
+			}
+		};
+
+		var on_error = function (event) {
+			console.log("On Error Event");
+			$("#channel-up").click();
+		};
+
+		var create_player = function () {
+			return new YT.Player("yt-iframe", {
+				width: 1280,
+				height: 720,
+				videoId: get_next_video(),
+				playerVars: {
+					"autoplay": 1,
+					"controls": 0,
+					"showinfo": 0,
+					"rel": 0,
+					"iv_load_policy": 3,
+					"disablekb": 1
+				},
+				events: {
+					"onReady": on_ready,
+					"onStateChange": on_state_change,
+					"onError": on_error
+				}
+			});
+		};
+
+
+		return function () {
+
+			toggle_tv_classes();
+
+			if (player !== null) {
+
+				player.destroy();
+
+				var handlers = ["#menu", "#mute", "#channel-up", "#volume-up", "#volume-down", "#video-url"];
+
+				handlers.forEach(function (item) {
+					$(item).off("click");
+				});
+
+				// Make sure we disable the menu.
+				$('.container').removeClass('menu-overlay');
+
+
+				// Make sure we can restart the TV
+				player = null;
+
+				return;
+			}
+
+			player = create_player();
+
+		};
+	})();
+
+	$("#power").on("click", animate_callback(sound_effect(tv_toggle, "off")));
+	$('body').addClass('tv-off');
+
+	$("#zoom").on("click", animate_callback(function () {
+		$('.container').toggleClass('zoom');
+	}));
 });
