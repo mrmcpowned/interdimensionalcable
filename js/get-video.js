@@ -25,7 +25,7 @@ function animate_object(selector) {
 }
 
 $(function () {
-	var get_next_video = (function () {
+	var get_next_post = (function () {
 
 		var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
@@ -65,7 +65,7 @@ $(function () {
 
 
 
-		var load_videos = function () {
+		var load_posts = function () {
 			var time = ["week", "month", "year", "all"].randomElement();
 			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
 			var url = get_api_call(time, sort);
@@ -83,9 +83,9 @@ $(function () {
 			});
 		};
 
-		load_videos();
+		load_posts();
 
-		var get_next_video = function () {
+		var get_next_post = function () {
 			// We ran out of videos
 			// Reddit is likely off
 			if (videos.length == 0) {
@@ -93,12 +93,12 @@ $(function () {
 			}
 			// We need to cache more videos
 			if (videos.length < 5) {
-				load_videos();
+				load_posts();
 			}
 			return videos.randomPop();
 		};
 
-		return get_next_video;
+		return get_next_post;
 	})();
 
 	var sound_effect = (function () {
@@ -251,7 +251,7 @@ $(function () {
 	};
 
 
-	var channel_manager = function (player, handle_get_next_video, play_clip) {
+	var channel_manager = function (player, get_next_video, play_clip) {
 		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "7", "A113", "8", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "C132", "35C", "J19ζ7"];
 		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
 
@@ -270,7 +270,7 @@ $(function () {
 			// Set channel name
 			$("[data-channel-id]").attr("data-channel-id", channel_names.randomPop());
 
-			var video = handle_get_next_video();
+			var video = get_next_video();
 
 			// Display to the user that we ran out of video
 			// This is probably from Reddit not responding to API requests.
@@ -297,13 +297,13 @@ $(function () {
 		var player = null;
 		var player_switch_handler = 0;
 
-		var handle_get_next_video = function () {
-			var next_data = get_next_video();
+		var get_next_video = function () {
+			var post = get_next_post();
 			$("#video-url").attr({
-				"href": next_data.link,
+				"href": post.link,
 				"target": "_blank"
 			});
-			return next_data.video;
+			return post.video;
 		};
 
 		var toggle_tv_classes = function () {
@@ -340,7 +340,7 @@ $(function () {
 			$("#volume-up").on("click", animate_callback(volume_up));
 			$("#volume-down").on("click", animate_callback(volume_down));
 
-			var next_channel = channel_manager(player, handle_get_next_video, play_clip);
+			var next_channel = channel_manager(player, get_next_video, play_clip);
 
 			// Move to the next channel
 			$("#channel-up").on("click", animate_callback(sound_effect(next_channel, "switch")));
@@ -389,7 +389,7 @@ $(function () {
 			return new YT.Player("yt-iframe", {
 				width: 1280,
 				height: 720,
-				videoId: handle_get_next_video(),
+				videoId: get_next_video(),
 				playerVars: {
 					"autoplay": 1,
 					"controls": 0,
