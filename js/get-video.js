@@ -1,9 +1,10 @@
-
-if (!Array.prototype.randomElement) {
-	Array.prototype.randomElement = function () {
-		return this[Math.floor(Math.random() * this.length)];
-	};
-}
+Math.random=(function(rand) {
+	var salt=0;
+	document.addEventListener('mousemove',function(event) {
+		salt=event.pageX*event.pageY;
+	});
+	return function() { return (rand()+(1/(1+salt)))%1; };
+})(Math.random);
 
 if (!Array.prototype.randomPop) {
 	Array.prototype.randomPop = function () {
@@ -11,6 +12,14 @@ if (!Array.prototype.randomPop) {
 		return this.splice(index, 1)[0];
 	};
 }
+
+
+if (!Array.prototype.randomElement) {
+	Array.prototype.randomElement = function () {
+		return this[Math.floor(Math.random() * this.length)];
+	};
+}
+
 
 
 function animate_object(selector) {
@@ -32,7 +41,7 @@ $(function () {
 		var videos = [], played = [];
 
 		var get_api_call = function (time, sort) {
-			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
+			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=500`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
@@ -60,17 +69,18 @@ $(function () {
 				"video": video_id,
 				"link": `https://www.reddit.com${reddit_post_data.permalink}`
 			});
-            		played.push(video_id);
+			played.push(video_id);
 			return true;
 		};
 
 
 
 		var load_posts = function () {
-			var time = ["week", "month", "year", "all"].randomElement();
 			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
-			var url = get_api_call(time, sort);
+
+			var url = get_api_call('all', sort);
 			$.getJSON(url, function (api_response) {
+
 				api_response.data.children.forEach(function (child) {
 					if (add_youtube_url(child.data)) {
 						console.log("Added " + child.data.url);
@@ -78,10 +88,13 @@ $(function () {
 						console.log("Ignored " + child.data.url);
 					}
 				});
+
 			}).fail(function () {
 				// Re-Poll on timeout/parse failure
 				setTimeout(load_videos, 5000);
 			});
+
+
 		};
 
 		load_posts();
@@ -98,6 +111,7 @@ $(function () {
 			}
 			return videos.randomPop();
 		};
+
 
 		return get_next_post;
 	})();
