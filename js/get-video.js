@@ -333,7 +333,7 @@ $(function () {
 		};
 
 		var on_ready = function (event) {
-			alert("hola");
+			alert("hola\n"+volume_controller(player));
 			channel_manager(player, get_next_video, play_clip);
 			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
 
