@@ -42,6 +42,7 @@ $(function () {
 			cb_subs[2] = document.getElementById("ACI"); // ACIDS
 			cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
 			
+			var final_url;
 			var exist_checked = false;
 			for (i = 0; i < len_subs; i++) {
 				exist_checked = exist_checked || cb_subs[i].checked
@@ -83,8 +84,8 @@ $(function () {
 						// Re-Poll on timeout/parse failure
 						setTimeout(load_videos, 5000);
 					});
-					//alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
-					//return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
+					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+suffix);
+					return "https://www.reddit.com"+tx_subs[random_sub]+"/"+page+suffix;
 				}
 			}
 			
