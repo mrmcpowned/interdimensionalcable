@@ -36,24 +36,35 @@ $(function () {
 		var videos = [], played = [];
 
 		var get_api_call = function (time, sort) {
-			var random_sub = 0;
-			var cb_subs = new Array(4);
-			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
-			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
-			cb_subs[2] = document.getElementById("ACI"); // ACIDS
-			cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
-			do {
-				var random_sub = Math.floor(4 * Math.random());
-			}
-			while ( cb_subs[random_sub].checked == false );
-			tx_message = "Checkeados:\n";
+			var exist_checked = false;
 			for (i = 0; i < len_subs; i++) {
-				if ( cb_subs[i].checked == true )
-					tx_message += " · " + tx_subs[i] + "\n";
+				exist_checked = exist_checked || cb_subs[i].checked
+			}
+			
+			if (exist_checked){
+				var cb_subs = new Array(4);
+				cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
+				cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
+				cb_subs[2] = document.getElementById("ACI"); // ACIDS
+				cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
+				do {
+					var random_sub = Math.floor(4 * Math.random());
+				}
+				while ( cb_subs[random_sub].checked == false );
+				tx_message = "Checkeados:\n";
+				for (i = 0; i < len_subs; i++) {
+					if ( cb_subs[i].checked == true )
+						tx_message += " · " + tx_subs[i] + "\n";
+				}
+				
+			}else{
+				// if non option is 
+				// checked, use /r/InterdimensionalCable
+				// by default
+				var random_sub = 0;
 			}
 			alert(tx_message);
-			
-			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=2`;
+			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=7`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
@@ -66,9 +77,9 @@ $(function () {
 			if (reddit_post_data.url.indexOf("t=") != -1) {
 				return false;
 			}
-			// Check if a reddit post has less than 25 points.
+			// Check if a reddit post has less than 1 points.
 			// If the post does, ignore it. It is unworthy.
-			if (reddit_post_data.score < 5) {
+			if (reddit_post_data.score > 0) {
 				return false;
 			}
 			var groups = youtube_video_regex.exec(reddit_post_data.url);
