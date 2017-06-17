@@ -65,11 +65,11 @@ $(function () {
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
 			var suffix = ``
 			if (!first_results){
-				alert("CHAO TARADO");
+				alert("HOLA TARADO");
 				var random_post_data;
+				alert(prefix+`/random.json`);
 				$.getJSON(prefix+`/random.json`, function (api_response) {
 					api_response.data.children.forEach(function (child) {
-						alert(child.data);
 						random_post_data = child.data;
 						suffix = `&after=`+ random_post_data.name;
 						alert(random_post_data.name);
