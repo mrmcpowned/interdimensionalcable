@@ -38,11 +38,10 @@ $(function () {
 		var get_api_call = function (time, sort) {
 			var random_sub = 0;
 			var cb_subs = new Array(4);
-			
-			cb_subs[0] = $("#IDC"); // Interdimensional Cable
-			cb_subs[1] = $("#NTE"); // Not Tim and Eric
-			cb_subs[2] = $("#ACI"); // ACIDS
-			cb_subs[3] = $("#FWV"); // Fifth World Videos
+			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
+			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
+			cb_subs[2] = document.getElementById("ACI"); // ACIDS
+			cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
 			do {
 				var random_sub = Math.floor(4 * Math.random());
 			}
@@ -54,7 +53,7 @@ $(function () {
 			}
 			alert(tx_message);
 			
-			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=20`;
+			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=2`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
