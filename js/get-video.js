@@ -35,7 +35,7 @@ $(function () {
 
 		var videos = [], played = [];
 
-		var get_api_call = function (time, sort, first_results) {
+		var get_api_call = function (time, sort, page, random_page) {
 			var cb_subs = new Array(4);
 			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
 			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
@@ -64,15 +64,15 @@ $(function () {
 			}
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
 			var suffix = ``
-			if (!first_results){
-				alert("SO-QUE-TE");
+			if (random_page){
+				var use_randomrising = [false].randomElement();
+				if (!use_randomrising){
 				var random_post_data;
 				alert(prefix+`/random.json`);
 				$.getJSON(prefix+`/random.json`, function (api_response) {
 					api_response[0].data.children.forEach(function (child) {
 						random_post_data = child.data;
 						suffix = `&after=`+ random_post_data.name;
-						alert(`https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort="top"&t="all"&show="all"&limit=7`+suffix);
 						if (add_youtube_url(child.data)) {
 							console.log("Added " + child.data.url);
 						} else {
@@ -83,6 +83,8 @@ $(function () {
 					// Re-Poll on timeout/parse failure
 					setTimeout(load_videos, 5000);
 				});
+				alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
+				return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};}
 			}
 			
 			alert(tx_message+"\n SUFFIX:"+suffix);
@@ -121,12 +123,13 @@ $(function () {
 
 
 		var load_posts = function () {
-			//var time = ["week", "month", "year", "all"].randomElement();
-			//var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
+			var time = ["week", "month", "year", "all"].randomElement();
+			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
+			var page = ["hot", "top", "new"].randomElement();
 			var time = ["all"].randomElement();
 			var sort = ["top"].randomElement();
-			var first_results = [false].randomElement();
-			var url = get_api_call(time, sort, first_results);			
+			var random_page = [true].randomElement();
+			var url = get_api_call(time, sort, page, random_page);			
 			$.getJSON(url, function (api_response) {
 				api_response.data.children.forEach(function (child) {
 					if (add_youtube_url(child.data)) {
