@@ -65,10 +65,11 @@ $(function () {
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
 			var suffix = ``
 			if (!first_results){
-				alert("HOLA TARADO");
+				alert("CHAO TARADO");
 				var random_post_data;
 				$.getJSON(prefix+`/random.json`, function (api_response) {
 					api_response.data.children.forEach(function (child) {
+						alert(child.data);
 						random_post_data = child.data;
 						suffix = `&after=`+ random_post_data.name;
 						alert(random_post_data.name);
@@ -84,7 +85,7 @@ $(function () {
 				});
 			}
 			
-			alert(tx_message+"\n SUFFFIX:"+suffix);
+			alert(tx_message+"\n SUFFIX:"+suffix);
 			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
 		};
 
