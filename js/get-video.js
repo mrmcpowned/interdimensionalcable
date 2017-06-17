@@ -35,7 +35,7 @@ $(function () {
 
 		var videos = [], played = [];
 
-		var get_api_call = function (time, sort) {
+		var get_api_call = function (time, sort, first_results) {
 			var cb_subs = new Array(4);
 			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
 			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
@@ -62,8 +62,28 @@ $(function () {
 				// by default
 				var random_sub = 0;
 			}
-			alert(tx_message);
-			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=7`;
+			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
+			var suffix = ``
+			if (!first_results){
+				var random_post_data;
+				$.getJSON(prefix+`/random.json`, function (api_response) {
+					api_response.data.children.forEach(function (child) {
+						random_post_data = child.data;
+						suffix = `&after=`+ random_post_data.name;
+						if (add_youtube_url(child.data)) {
+							console.log("Added " + child.data.url);
+						} else {
+							console.log("Ignored " + child.data.url);
+						}
+					});
+				}).fail(function () {
+					// Re-Poll on timeout/parse failure
+					setTimeout(load_videos, 5000);
+				});
+			}
+			
+			alert(tx_message+"\n SUFFIX:"+suffix);
+			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
@@ -100,7 +120,8 @@ $(function () {
 		var load_posts = function () {
 			var time = ["week", "month", "year", "all"].randomElement();
 			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
-			var url = get_api_call(time, sort);
+			var first_results = [false].randomElement();
+			var url = get_api_call(time, sort, first_results);			
 			$.getJSON(url, function (api_response) {
 				api_response.data.children.forEach(function (child) {
 					if (add_youtube_url(child.data)) {
