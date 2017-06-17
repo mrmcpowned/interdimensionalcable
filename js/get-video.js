@@ -36,27 +36,26 @@ $(function () {
 		var videos = [], played = [];
 
 		var get_api_call = function (time, sort) {
+			var cb_subs = new Array(4);
+			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
+			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
+			cb_subs[2] = document.getElementById("ACI"); // ACIDS
+			cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
+			
 			var exist_checked = false;
 			for (i = 0; i < len_subs; i++) {
 				exist_checked = exist_checked || cb_subs[i].checked
 			}
-			
 			if (exist_checked){
-				var cb_subs = new Array(4);
-				cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
-				cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
-				cb_subs[2] = document.getElementById("ACI"); // ACIDS
-				cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
 				do {
 					var random_sub = Math.floor(4 * Math.random());
-				}
-				while ( cb_subs[random_sub].checked == false );
+				} while (cb_subs[random_sub].checked == false);
+				
 				tx_message = "Checkeados:\n";
 				for (i = 0; i < len_subs; i++) {
 					if ( cb_subs[i].checked == true )
 						tx_message += " · " + tx_subs[i] + "\n";
 				}
-				
 			}else{
 				// if non option is 
 				// checked, use /r/InterdimensionalCable
