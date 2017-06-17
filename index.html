@@ -135,6 +135,46 @@ TODO: Opengraph meta data to make things look nice when finished
             </div>
         </div>
     </div>
+    <!-- KEYBOARD CODE   -->
+    <script>
+        $(document).ready(function(){
+            $(document).keypress(function(event){
+                if (event.which == 43)//Vol (+)
+                $("#volume-up").click();
+
+                if (event.which == 45)//Vol (-)
+                $("#volume-down").click();
+            });
+            $(document).keydown(function(event){
+                if (event.which == 83) //(S)ilence (Mute)
+                $("#mute").click();
+
+                if (event.which == 77) //(M)enu
+                $("#menu").click();
+
+                if (event.which == 82) //(R)eddit (OK)
+                $("#video-url").click();
+
+                if (event.which == 90) //(Z)oom
+                $("#zoom").click();
+
+                if (event.which == 80) //(P)ower
+                $("#power").click();
+
+                if (event.which == 79) //(O)N/OFF
+                $("#power").click();
+
+                if (event.which == 67) //(C)hannel (CH+)
+                $("#channel-up").click();
+
+                if (event.which == 78) //(N)ext (CH+)
+                $("#channel-up").click();
+
+                if (event.which == 74) // J (vi down/next button) (CH+)
+                $("#channel-up").click();
+            });
+        });
+    </script>
     <script src="js/get-video.js"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
     <script>
