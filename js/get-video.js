@@ -84,7 +84,7 @@ $(function () {
 						setTimeout(load_videos, 5000);
 					});
 					//alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
-					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
+					//return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
 				}
 			}
 			
