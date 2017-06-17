@@ -85,9 +85,6 @@ $(function () {
 								console.log("Ignored " + child.data.url);
 							}
 						});
-					}).fail(function () {
-						// Re-Poll on timeout/parse failure
-						setTimeout(load_videos, 5000);
 					});
 					$.ajaxSetup({
 					    async: true
