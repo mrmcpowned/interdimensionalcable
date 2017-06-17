@@ -65,6 +65,7 @@ $(function () {
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
 			var suffix = ``
 			if (!first_results){
+				alert("HOLA TARADO");
 				var random_post_data;
 				$.getJSON(prefix+`/random.json`, function (api_response) {
 					api_response.data.children.forEach(function (child) {
@@ -83,7 +84,7 @@ $(function () {
 				});
 			}
 			
-			alert(tx_message+"\n SUFFIX:"+suffix);
+			alert(tx_message+"\n SUFFFIX:"+suffix);
 			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
 		};
 
