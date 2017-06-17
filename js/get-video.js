@@ -70,7 +70,7 @@ $(function () {
 				if (!use_randomrising){
 					var random_post_data;
 					alert(prefix+`/random.json`);
-					$.getJSON(prefix+`/random.json`, function (api_response) {
+					$.getJSON(prefix+`/random.json`).then(function (api_response) {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
 							suffix = `?after=`+ random_post_data.name;
@@ -89,10 +89,12 @@ $(function () {
 				}else{
 					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit=7";
 				}
+			}else{
+				alert(tx_message+"\n SUFFIX:"+suffix);
+				return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
 			}
 			
-			alert(tx_message+"\n SUFFIX:"+suffix);
-			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
+			return null;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
