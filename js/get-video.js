@@ -75,7 +75,8 @@ $(function () {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
 							suffix = `?after=`+ random_post_data.name;
-							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix
+							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix+`&limit=7`
+							alert(new_url);
 							is_ready = true;
 							if (add_youtube_url(child.data)) {
 								console.log("Added " + child.data.url);
@@ -160,7 +161,7 @@ $(function () {
 					// Re-Poll on timeout/parse failure
 					setTimeout(load_videos, 5000);
 				});
-			}else{alert("funciono");}
+			}//Else: see inside get_api_call()
 		};
 
 		load_posts();
