@@ -62,7 +62,10 @@ h1, h2{
     font-size: 1.6vw;
 }
 h2{
-    font-size: 1.25vw;
+    font-size: 1.0vw;
+}
+h3{
+    margin: 0 0 .4vw 0;
 }
 .contents .left,
 .contents .right {
@@ -415,7 +418,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 .shows{
     display: flex;
     flex-direction: column;
-    height: 10.5vw;
+    height: 7.3vw;
     overflow-y: auto;
     overflow-x: hidden;
 }
