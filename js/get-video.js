@@ -34,6 +34,25 @@ $(function () {
 		var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
 		var videos = [], played = [];
+		
+		var get_random_post = function (prefix) {
+			var random_post_data;
+			alert(prefix+`/random.json`);
+			$.getJSON(prefix+`/random.json`, function (api_response) {
+				api_response[0].data.children.forEach(function (child) {
+					random_post_data = child.data;
+					if (add_youtube_url(child.data)) {
+						console.log("Added " + child.data.url);
+					} else {
+						console.log("Ignored " + child.data.url);
+					}
+				});
+			}).fail(function () {
+				// Re-Poll on timeout/parse failure
+				setTimeout(load_videos, 5000);
+			});
+			return random_post_data.name;
+		}
 
 		var get_api_call = function (time, sort, page, random_page) {
 			var cb_subs = new Array(4);
@@ -68,22 +87,7 @@ $(function () {
 			if (random_page){
 				var use_randomrising = [false].randomElement();
 				if (!use_randomrising){
-					var random_post_data;
-					alert(prefix+`/random.json`);
-					$.getJSON(prefix+`/random.json`, function (api_response) {
-						api_response[0].data.children.forEach(function (child) {
-							random_post_data = child.data;
-							suffix = `?after=`+ random_post_data.name;
-							if (add_youtube_url(child.data)) {
-								console.log("Added " + child.data.url);
-							} else {
-								console.log("Ignored " + child.data.url);
-							}
-						});
-					}).fail(function () {
-						// Re-Poll on timeout/parse failure
-						setTimeout(load_videos, 5000);
-					});
+					suffix = `?after=`+ get_random_post(prefix);
 					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
 					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix;
 				}else{
