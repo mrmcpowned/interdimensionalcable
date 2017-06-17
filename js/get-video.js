@@ -335,7 +335,9 @@ $(function () {
 		var on_ready = function (event) {
 			alert("hola\n"+volume_controller(player));
 			channel_manager(player, get_next_video, play_clip);
-			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+			// Changing this line because I need to run this in legacy machines
+			//let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+			var [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
 
 			// Volume control
 			$("#mute").on("click", animate_callback(toggle_mute));
