@@ -47,7 +47,13 @@ $(function () {
 				var random_sub = Math.floor(4 * Math.random());
 			}
 			while ( cb_subs[random_sub].checked == false );
-				
+			tx_message = "Checkeados:\n";
+			for (i = 0; i < len_subs; i++) {
+				if ( cb_subs[i].checked == true )
+					tx_message += " · " + tx_subs[i] + "\n";
+			}
+			alert(tx_message);
+			
 			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=2`;
 		};
 
