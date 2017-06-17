@@ -333,6 +333,7 @@ $(function () {
 		};
 
 		var on_ready = function (event) {
+			alert("hola");
 			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
 
 			// Volume control
