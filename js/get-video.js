@@ -108,11 +108,12 @@ $(function () {
 		load_posts();
 
 		var get_next_post = function () {
-			// We ran out of videos
-			// Reddit is likely off
-			if (videos.length == 0) {
-				return null;
-			}
+			// Removing this exception, now if length is zero, try again AND again.
+				// We ran out of videos
+				// Reddit is likely off
+				//if (videos.length == 0) {
+				//	return null;
+				//}
 			// We need to cache more videos
 			if (videos.length < 5) {
 				load_posts();
