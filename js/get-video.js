@@ -400,7 +400,11 @@ $(function () {
 		var on_ready = function (event) {
 			// Changing this line because I need to run this in legacy machines
 			//let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
-			var [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+			var volume_controller_return = volume_controller(player);
+			var toggle_mute = volume_controller_return[0]
+			var volume_up = volume_controller_return[1]
+			var volume_down = volume_controller_return[2]
+			var play_clip = volume_controller_return[3]
 
 			// Volume control
 			$("#mute").on("click", animate_callback(toggle_mute));
