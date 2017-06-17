@@ -73,7 +73,7 @@ $(function () {
 					$.getJSON(prefix+`/random.json`, function (api_response) {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
-							suffix = `&after=`+ random_post_data.name;
+							suffix = `?after=`+ random_post_data.name;
 							if (add_youtube_url(child.data)) {
 								console.log("Added " + child.data.url);
 							} else {
@@ -86,6 +86,8 @@ $(function () {
 					});
 					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+suffix);
 					return "https://www.reddit.com"+tx_subs[random_sub]+"/"+page+suffix;
+				}else{
+					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising?limit=7";
 				}
 			}
 			
