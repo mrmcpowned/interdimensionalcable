@@ -69,7 +69,7 @@ $(function () {
 				var random_post_data;
 				alert(prefix+`/random.json`);
 				$.getJSON(prefix+`/random.json`, function (api_response) {
-					api_response.data.children.forEach(function (child) {
+					api_response[0].data.children.forEach(function (child) {
 						random_post_data = child.data;
 						suffix = `&after=`+ random_post_data.name;
 						alert(random_post_data.name);
