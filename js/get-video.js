@@ -70,6 +70,7 @@ $(function () {
 					api_response.data.children.forEach(function (child) {
 						random_post_data = child.data;
 						suffix = `&after=`+ random_post_data.name;
+						alert(random_post_data.name);
 						if (add_youtube_url(child.data)) {
 							console.log("Added " + child.data.url);
 						} else {
