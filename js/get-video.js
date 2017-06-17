@@ -70,7 +70,10 @@ $(function () {
 				if (!use_randomrising){
 					var random_post_data;
 					var is_ready = false;
-					$.getJSON(prefix+`/random.json`).done(function (api_response) {
+					$.ajaxSetup({
+    						async: false
+					});
+					$.getJSON(prefix+`/random.json`,function (api_response) {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
 							suffix = `?after=`+ random_post_data.name;
@@ -86,9 +89,9 @@ $(function () {
 						// Re-Poll on timeout/parse failure
 						setTimeout(load_videos, 5000);
 					});
-					while (is_ready == false){
-						sleep(500);
-					}
+					$.ajaxSetup({
+					    async: true
+					});
 					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
 					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix;
 				}else{
