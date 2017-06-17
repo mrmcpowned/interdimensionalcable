@@ -144,6 +144,9 @@ TODO: Opengraph meta data to make things look nice when finished
 
                 if (event.which == 45)//Vol (-)
                 $("#volume-down").click();
+                
+                if (event.which == 74) // -> (next) (CH+)
+                $("#channel-up").click();
             });
             $(document).keydown(function(event){
                 if (event.which == 83) //(S)ilence (Mute)
@@ -171,9 +174,6 @@ TODO: Opengraph meta data to make things look nice when finished
                 $("#channel-up").click();
 
                 if (event.which == 74) // J (vi down/next button) (CH+)
-                $("#channel-up").click();
-                
-                if (event.which == 74) // -> (next) (CH+)
                 $("#channel-up").click();
             });
         });
