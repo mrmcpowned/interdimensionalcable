@@ -84,10 +84,10 @@ $(function () {
 						// Re-Poll on timeout/parse failure
 						setTimeout(load_videos, 5000);
 					});
-					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+suffix);
-					return "https://www.reddit.com"+tx_subs[random_sub]+"/"+page+suffix;
+					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
+					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix;
 				}else{
-					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising?limit=7";
+					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit=7";
 				}
 			}
 			
