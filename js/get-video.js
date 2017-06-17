@@ -66,7 +66,7 @@ $(function () {
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
 			var suffix = ``;
 			if (random_page){
-				var use_randomrising = [false].randomElement();
+				var use_randomrising = [true,false].randomElement();
 				if (!use_randomrising){
 					var random_post_data;
 					var is_ready = false;
@@ -144,9 +144,7 @@ $(function () {
 			var time = ["week", "month", "year", "all"].randomElement();
 			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
 			var page = ["hot", "top", "new"].randomElement();
-			var time = ["all"].randomElement();
-			var sort = ["top"].randomElement();
-			var random_page = [true].randomElement();
+			var random_page = [true,false].randomElement();
 			var url = get_api_call(time, sort, page, random_page);
 			if (url != "nada") {//Dirty awful hack
 				$.getJSON(url, function (api_response) {
