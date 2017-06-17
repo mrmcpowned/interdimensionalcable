@@ -63,28 +63,28 @@ $(function () {
 				var random_sub = 0;
 			}
 			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
-			var suffix = ``
+			var suffix = ``;
 			if (random_page){
 				var use_randomrising = [false].randomElement();
 				if (!use_randomrising){
-				var random_post_data;
-				alert(prefix+`/random.json`);
-				$.getJSON(prefix+`/random.json`, function (api_response) {
-					api_response[0].data.children.forEach(function (child) {
-						random_post_data = child.data;
-						suffix = `&after=`+ random_post_data.name;
-						if (add_youtube_url(child.data)) {
-							console.log("Added " + child.data.url);
-						} else {
-							console.log("Ignored " + child.data.url);
-						}
+					var random_post_data;
+					alert(prefix+`/random.json`);
+					$.getJSON(prefix+`/random.json`, function (api_response) {
+						api_response[0].data.children.forEach(function (child) {
+							random_post_data = child.data;
+							suffix = `&after=`+ random_post_data.name;
+							if (add_youtube_url(child.data)) {
+								console.log("Added " + child.data.url);
+							} else {
+								console.log("Ignored " + child.data.url);
+							}
+						});
+					}).fail(function () {
+						// Re-Poll on timeout/parse failure
+						setTimeout(load_videos, 5000);
 					});
-				}).fail(function () {
-					// Re-Poll on timeout/parse failure
-					setTimeout(load_videos, 5000);
-				});
-				//alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
-				return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
+					//alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
+					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
 				}
 			}
 			
