@@ -83,8 +83,9 @@ $(function () {
 					// Re-Poll on timeout/parse failure
 					setTimeout(load_videos, 5000);
 				});
-				alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
-				return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};}
+				//alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix});
+				return `https://www.reddit.com`+tx_subs[random_sub]+`/`+${page}+${suffix};
+				}
 			}
 			
 			alert(tx_message+"\n SUFFIX:"+suffix);
