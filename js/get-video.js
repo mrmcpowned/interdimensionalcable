@@ -54,7 +54,7 @@ $(function () {
 			}
 			alert(tx_message);
 			
-			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=2`;
+			return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=20`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
