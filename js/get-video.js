@@ -50,7 +50,7 @@ $(function () {
 			}
 			if (exist_checked){
 				do {
-					var random_sub = Math.floor(4 * Math.random());
+					var random_sub = Math.floor(len_subs * Math.random());
 				} while (cb_subs[random_sub].checked == false);
 				
 				tx_message = "Checkeados:\n";
