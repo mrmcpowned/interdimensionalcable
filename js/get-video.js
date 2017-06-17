@@ -1,3 +1,5 @@
+var tx_subs = ["/r/InterdimensionalCable", "/r/NotTimAndEric", "/r/ACIDS", "/r/fifthworldvideos"];
+var len_subs = tx_subs.length;
 
 if (!Array.prototype.randomElement) {
 	Array.prototype.randomElement = function () {
@@ -32,7 +34,7 @@ $(function () {
 		var videos = [], played = [];
 
 		var get_api_call = function (time, sort) {
-			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
+			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=1`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
@@ -333,8 +335,6 @@ $(function () {
 		};
 
 		var on_ready = function (event) {
-			alert("hola\n"+volume_controller(player));
-			channel_manager(player, get_next_video, play_clip);
 			// Changing this line because I need to run this in legacy machines
 			//let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
 			var [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
