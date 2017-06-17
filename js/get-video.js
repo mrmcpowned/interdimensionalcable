@@ -70,7 +70,6 @@ $(function () {
 				if (!use_randomrising){
 					var random_post_data;
 					var is_ready = false;
-					alert(prefix+`/random.json`);
 					$.getJSON(prefix+`/random.json`).done(function (api_response) {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
@@ -88,7 +87,7 @@ $(function () {
 						setTimeout(load_videos, 5000);
 					});
 					while (is_ready == false){
-						await sleep(500);
+						sleep(500);
 					}
 					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
 					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix;
