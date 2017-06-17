@@ -1,6 +1,16 @@
+//Adding support to different subredits
 var tx_subs = ["/r/InterdimensionalCable", "/r/NotTimAndEric", "/r/ACIDS", "/r/fifthworldvideos"];
 var len_subs = tx_subs.length;
 
+var cb_subs = new Array(4);
+cb_subs[0] = $("#IDC"); // Interdimensional Cable
+cb_subs[1] = $("#NTE"); // Not Tim and Eric
+cb_subs[2] = $("#ACI"); // ACIDS
+cb_subs[3] = $("#FWV"); // Fifth World Videos
+
+cb_subs[0].checked = true;
+
+//Begining of original code
 if (!Array.prototype.randomElement) {
 	Array.prototype.randomElement = function () {
 		return this[Math.floor(Math.random() * this.length)];
@@ -34,7 +44,7 @@ $(function () {
 		var videos = [], played = [];
 
 		var get_api_call = function (time, sort) {
-			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=1`;
+			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=2`;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
