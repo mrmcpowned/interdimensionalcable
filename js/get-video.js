@@ -70,14 +70,12 @@ $(function () {
 				if (!use_randomrising){
 					var random_post_data;
 					var is_ready = false;
-					$.ajaxSetup({
-    						async: false
-					});
+					var new_url;
 					$.getJSON(prefix+`/random.json`,function (api_response) {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
 							suffix = `?after=`+ random_post_data.name;
-							alert (suffix);
+							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix
 							is_ready = true;
 							if (add_youtube_url(child.data)) {
 								console.log("Added " + child.data.url);
@@ -85,12 +83,20 @@ $(function () {
 								console.log("Ignored " + child.data.url);
 							}
 						});
+						$.getJSON(new_url, function (api_response) {
+							api_response.data.children.forEach(function (child) {
+								if (add_youtube_url(child.data)) {
+									console.log("Added " + child.data.url);
+								} else {
+									console.log("Ignored " + child.data.url);
+								}
+							});
+						}).fail(function () {
+							// Re-Poll on timeout/parse failure
+							setTimeout(load_videos, 5000);
+						});
 					});
-					$.ajaxSetup({
-					    async: true
-					});
-					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
-					return `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix;
+					return "nada"
 				}else{
 					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit=7";
 				}
@@ -140,19 +146,21 @@ $(function () {
 			var time = ["all"].randomElement();
 			var sort = ["top"].randomElement();
 			var random_page = [true].randomElement();
-			var url = get_api_call(time, sort, page, random_page);			
-			$.getJSON(url, function (api_response) {
-				api_response.data.children.forEach(function (child) {
-					if (add_youtube_url(child.data)) {
-						console.log("Added " + child.data.url);
-					} else {
-						console.log("Ignored " + child.data.url);
-					}
+			var url = get_api_call(time, sort, page, random_page);
+			if (url != "nada") {//Dirty awful hack
+				$.getJSON(url, function (api_response) {
+					api_response.data.children.forEach(function (child) {
+						if (add_youtube_url(child.data)) {
+							console.log("Added " + child.data.url);
+						} else {
+							console.log("Ignored " + child.data.url);
+						}
+					});
+				}).fail(function () {
+					// Re-Poll on timeout/parse failure
+					setTimeout(load_videos, 5000);
 				});
-			}).fail(function () {
-				// Re-Poll on timeout/parse failure
-				setTimeout(load_videos, 5000);
-			});
+			}else{alert("funciono");}
 		};
 
 		load_posts();
