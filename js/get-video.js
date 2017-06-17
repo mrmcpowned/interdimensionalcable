@@ -70,17 +70,20 @@ $(function () {
 				if (!use_randomrising){
 					var random_post_data;
 					alert(prefix+`/random.json`);
-					var api_response =  $.getJSON(prefix+`/random.json`)
-					
-					api_response[0].data.children.forEach(function (child) {
-						random_post_data = child.data;
-						suffix = `?after=`+ random_post_data.name;
-						alert (suffix);
-						if (add_youtube_url(child.data)) {
-							console.log("Added " + child.data.url);
-						} else {
-							console.log("Ignored " + child.data.url);
-						}
+					$.getJSON(prefix+`/random.json`).done(function (api_response) {
+						api_response[0].data.children.forEach(function (child) {
+							random_post_data = child.data;
+							suffix = `?after=`+ random_post_data.name;
+							alert (suffix);
+							if (add_youtube_url(child.data)) {
+								console.log("Added " + child.data.url);
+							} else {
+								console.log("Ignored " + child.data.url);
+							}
+						});
+					}).fail(function () {
+						// Re-Poll on timeout/parse failure
+						setTimeout(load_videos, 5000);
 					});
 
 					alert(`https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix);
