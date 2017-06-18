@@ -1,6 +1,8 @@
 //Adding support to different subredits
 var tx_subs = ["/r/InterdimensionalCable", "/r/NotTimAndEric", "/r/ACIDS", "/r/fifthworldvideos","/r/IllBeYourGuide"];
 var len_subs = tx_subs.length;
+var MAX_REQ = 50; //Max number of links will be requested each JSON call
+var PROB = 14; //Probability of accepting link (percentage)
 
 //Begining of original code
 if (!Array.prototype.randomElement) {
@@ -34,6 +36,11 @@ $(function () {
 		var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
 		var videos = [], played = [];
+		
+		var probability_filter = function() {
+			var trial = 100*Math.random();
+			return trial <= PROB;	
+		}
 
 		var get_api_call = function (time, sort, page, random_page) {
 			var cb_subs = new Array(len_subs);
@@ -76,20 +83,24 @@ $(function () {
 						api_response[0].data.children.forEach(function (child) {
 							random_post_data = child.data;
 							suffix = `?after=`+ random_post_data.name;
-							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix+`&limit=7`
+							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix+`&limit=`+(MAX_REQ-1);
 							is_ready = true;
-							if (add_youtube_url(child.data)) {
-								console.log("Added " + child.data.url);
-							} else {
-								console.log("Ignored " + child.data.url);
-							}
-						});
-						$.getJSON(new_url, function (api_response) {
-							api_response.data.children.forEach(function (child) {
+							if(probability_filter()){
 								if (add_youtube_url(child.data)) {
 									console.log("Added " + child.data.url);
 								} else {
 									console.log("Ignored " + child.data.url);
+								}
+							}
+						});
+						$.getJSON(new_url, function (api_response) {
+							api_response.data.children.forEach(function (child) {
+								if(probability_filter()){
+									if (add_youtube_url(child.data)) {
+										console.log("Added " + child.data.url);
+									} else {
+										console.log("Ignored " + child.data.url);
+									}
 								}
 							});
 						}).fail(function () {
@@ -99,10 +110,10 @@ $(function () {
 					});
 					return "nada"
 				}else{
-					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit=7";
+					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit="+(MAX_REQ);
 				}
 			}else{
-				return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=7`+suffix;
+				return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=`+MAX_REQ+suffix;
 			}
 			
 			return null;
@@ -148,10 +159,12 @@ $(function () {
 			if (url != "nada") {//Dirty awful hack
 				$.getJSON(url, function (api_response) {
 					api_response.data.children.forEach(function (child) {
-						if (add_youtube_url(child.data)) {
-							console.log("Added " + child.data.url);
-						} else {
-							console.log("Ignored " + child.data.url);
+						if(probability_filter()){
+							if (add_youtube_url(child.data)) {
+								console.log("Added " + child.data.url);
+							} else {
+								console.log("Ignored " + child.data.url);
+							}
 						}
 					});
 				}).fail(function () {
