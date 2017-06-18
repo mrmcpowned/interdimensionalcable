@@ -417,10 +417,11 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 }
 .shows{
     display: flex;
-    flex-direction: column;
-    height: 7.3vw;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /*flex-direction: column;*/
+    /*height: 7.3vw;*/
+    /*overflow-y: auto;*/
+    overflow-y: hidden;
+    /*overflow-x: hidden;*/
 }
 .zoom .shows{
     height: calc(10.5vw * var(--scale-ratio));
