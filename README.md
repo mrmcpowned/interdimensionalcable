@@ -8,10 +8,15 @@ you can visit it in https://topotech.github.io/interdimensionalcable/
 This new version has the following features:
 
  · Optional support of more subs with similar content can be activated via menu.
+ 
      > /r/NotTimAndEric,
+     
      > /r/ACIDS,
+     
      > /r/fifthworldvideos,
+     
      > /r/IllBeYourGuide.
+     
    If no option is selected, /r/InterdimensionalCable will be used by default.
  
  · New system that increases randomization. 
