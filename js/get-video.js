@@ -433,7 +433,7 @@ $(function () {
 			var play_clip = volume_controller_return[3]
 
 			// Volume control
-			$("#yt-iframe").keydown(function(event0){
+			$("#yt-iframe").keydown(function(event){
 				if (event.which == 70)//F
 					player.nextVideo();
 			});
