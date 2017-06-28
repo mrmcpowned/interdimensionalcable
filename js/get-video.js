@@ -433,6 +433,10 @@ $(function () {
 			var play_clip = volume_controller_return[3]
 
 			// Volume control
+			$("#yt-iframe").keydown(function(event0){
+				if (event.which == 70)//F
+					player.nextVideo();
+			});
 			$("#mute").on("click", animate_callback(toggle_mute));
 			$("#volume-up").on("click", animate_callback(volume_up));
 			$("#volume-down").on("click", animate_callback(volume_down));
