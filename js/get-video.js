@@ -343,7 +343,8 @@ $(function () {
 	};
 
 	var channel_manager = function (player, get_next_video, play_clip) {
-		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "💵", "💰", "7", "A113", "8", "AMMEL", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "☭", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "/co/", "C132", "35C", "J19ζ7"];
+		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "💵", "💰", "7", "A113", "8", "AMMEL", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "☭", "🍆", "20", "30", "40", "50", "60", "69", "
+				     ", "80", "90", "100", "/co/", "C132", "35C", "J19ζ7"];
 		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
 
 		var handle_quote = function () {
@@ -433,10 +434,6 @@ $(function () {
 			var play_clip = volume_controller_return[3]
 
 			// Volume control
-			$("#yt-iframe").keydown(function(event){
-				if (event.which == 70)//F
-					player.nextVideo();
-			});
 			$("#mute").on("click", animate_callback(toggle_mute));
 			$("#volume-up").on("click", animate_callback(volume_up));
 			$("#volume-down").on("click", animate_callback(volume_down));
