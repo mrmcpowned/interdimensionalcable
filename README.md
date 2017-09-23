@@ -15,7 +15,9 @@ This new version has the following features:
      
      > /r/fifthworldvideos,
      
-     > /r/IllBeYourGuide.
+     > /r/IllBeYourGuide,
+
+     > /r/CommercialCuts.
      
    If no option is selected, /r/InterdimensionalCable will be used by default.
  
@@ -33,3 +35,5 @@ This new version has the following features:
  · The code was modified so the site can be slightly more usable in more devices.
    It was tested on Android Lollipop: it presents buggy behavior but is usable, 
    specially with virtual keyboards like Ivan Volosyuk's "WiFi Keyboard".
+
+ · Added a slider to filter out low-score videos.
