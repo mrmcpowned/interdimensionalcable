@@ -70,6 +70,7 @@ h3{
 .contents .left,
 .contents .right {
     font-size: .85vw;
+    overflow-y: auto;
 }
 p {
     margin: 0 0 .5vw 0;
@@ -386,6 +387,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     display: block;
     color: #FFFFFF;
     z-index: 3;
+    overflow: auto;
 }
 .tv-menu .left,
 .tv-menu .right {
