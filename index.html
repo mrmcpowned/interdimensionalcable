@@ -2,6 +2,7 @@
 <html lang="en">
 
 <!--
+Original backlog of mrmcpowned:
 DONE: Add a zoom-in functionality
 TODO: Volume animations
 TODO: Offline Animations
@@ -18,7 +19,6 @@ TODO: Opengraph meta data to make things look nice when finished
     <meta charset="UTF-8">
     <title>Inter-Dimensional Cable</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script src="js/get-video.js"></script>
     <link rel="stylesheet" href="https://necolas.github.io/normalize.css/3.0.2/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet" type="text/css">
@@ -44,13 +44,13 @@ TODO: Opengraph meta data to make things look nice when finished
     <div class="remote-area">
         <div class="tips">
             <ul>
-                <li><b>Power Button</b>: Turns TV On/Off</li>
-                <li><b>Zoom</b>: Zooms the TV in or out for a better view</li>
-                <li><b>MENU</b>: Shows the TV menu which gives you a list of previously played shows and info about the site</li>
-                <li><b>MUTE</b>: Mutes the TV's audio</li>
-                <li><b>CH +</b>: Changes the channel</li>
-                <li><b>VOL +/-</b>: Adjusts the TV's volume</li>
-                <li><b>OK</b>: Opens the current video's Reddit thread in a new tab</li>
+                <li><b>Power Button</b>: Turns TV On/Off(O,P)</li>
+                <li><b>Zoom</b>: Zooms the TV in or out for a better view(Z)</li>
+                <li><b>MENU</b>: Shows the TV menu which gives you a list of previously played shows and info about the site(M)</li>
+                <li><b>MUTE</b>: Mutes the TV's audio(S)</li>
+                <li><b>CH +</b>: Changes the channel(N,J,C,right)</li>
+                <li><b>VOL +/-</b>: Adjusts the TV's volume(+/-)</li>
+                <li><b>OK</b>: Opens the current video's Reddit thread in a new tab(R)</li>
                 <li><b>NO SIGNAL</b>: Reddit's API is down. Turn your TV On and Off again to see if the signal is back</li>
             </ul>
         </div>
@@ -76,7 +76,7 @@ TODO: Opengraph meta data to make things look nice when finished
             <div class="bottom">
                 <span class="button wide" id="channel-up">CH +</span>
                 <span class="button large" id="volume-down"><span>VOL<br/>-</span></span>
-                <a href="#" class="button center red" id="video-url">OK</a>
+                <a href="#" class="button center red" id="video-url" target="_blank">OK</a>
                 <span class="button large" id="volume-up"><span>VOL<br/>+</span></span>
                 <span class="button wide"></span>
             </div>
@@ -100,14 +100,23 @@ TODO: Opengraph meta data to make things look nice when finished
             <div class="tv-menu">
                 <div class="contents">
                     <div class="left">
-                        <p>I'm <a href="https://mrmcpowned.com">Mr McPowned</a>. I <a href="http://gamepadviewer.com">kinda make stuff</a>. Some people call me <a href="http://chrisr.xyz">Chris</a>, and I don't really <a href="https://twitter.com/mrmcpowned">have much to say</a>. </p>
-                        <p>This thing's also <a href="https://github.com/mrmcpowned/interdimensionalcable">on github</a> if you wanna check that out.</p>
-                        <p><a href="https://steamcommunity.com/id/2Mill/">This guy</a> gave me the idea, but <a href="http://gravypod.com">this guy</a> actually helped me with stuff.</p>
+                        <p>Originally developed by <a href="https://mrmcpowned.com">Mr McPowned</a> (source on <a href="https://github.com/mrmcpowned/interdimensionalcable">on github</a>). Also <a href="http://gravypod.com">this guy</a> helped.</p>
+                        <p>Original idea by <a href="https://steamcommunity.com/id/2Mill/">this guy</a>.</p>
+                        <p>This version was tweaked by <a href="https://github.com/topotech/">this guy</a>, with a couple of features by <a href="https://github.com/williambl">This guy</a>.</p>
                     </div>
                     <div class="right">
-                        <h1>Menu - MrMcTV v1.0</h1>
-                        <p><i>A non-stop stream of intergalactic content from <a href="https://reddit.com/r/InterdimensionalCable">/r/InterdimensionalCable</a> straight to your eyeholes.</i></p>
-                        <h2>Past Shows</h2>
+                        <h2>Menu</h2>
+                        <p><i>A non-stop stream of intergalactic content straight to your eyeholes!</i></p>
+                        <h3>Select your sources</h3>
+                        <input type="checkbox" id="IDC" checked = "true">/r/InterdimensionalCable (default)<br>
+                        <input type="checkbox" id="NTE">/r/NotTimAndEric<br>
+                        <input type="checkbox" id="ACI">/r/ACIDS<br>
+                        <input type="checkbox" id="FWV">/r/fifthworldvideos<br>
+                        <input type="checkbox" id="IBG">/r/IllBeYourGuide<br>
+                        <input type="checkbox" id="CMC">/r/CommercialCuts
+                        <h3>Minimum score</h3>
+                        <input type="range" min="0" max="1000" value="1" class="slider" id="min_score"><span id="score_preview">1</span>
+                        <h3>Past Shows</h3>
                         <div id="list-template">
                             <li>
                                 <a href="">
@@ -130,6 +139,50 @@ TODO: Opengraph meta data to make things look nice when finished
             </div>
         </div>
     </div>
+    <!-- KEYBOARD CODE   -->
+    <script>
+        $(document).ready(function(){
+            $(document).keypress(function(event){
+                if (event.which == 43)//Vol (+)
+                $("#volume-up").click();
+
+                if (event.which == 45)//Vol (-)
+                $("#volume-down").click();
+            });
+            $(document).keydown(function(event){
+                if (event.which == 83) //(S)ilence (Mute)
+                $("#mute").click();
+
+                if (event.which == 77) //(M)enu
+                $("#menu").click();
+
+                if (event.which == 82) //(R)eddit (OK)
+                $("#video-url")[0].click();
+
+                if (event.which == 90) //(Z)oom
+                $("#zoom").click();
+
+                if (event.which == 80) //(P)ower
+                $("#power").click();
+
+                if (event.which == 79) //(O)N/OFF
+                $("#power").click();
+
+                if (event.which == 67) //(C)hannel (CH+)
+                $("#channel-up").click();
+
+                if (event.which == 78) //(N)ext (CH+)
+                $("#channel-up").click();
+
+                if (event.which == 74) // J (vi down/next button) (CH+)
+                $("#channel-up").click();
+                                
+                if (event.which == 39) // -> (next) (CH+)
+                $("#channel-up").click();
+            });
+        });
+    </script>
+    <script src="js/get-video.js"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
     <script>
         //CSS USer Agent Selectors from http://rog.ie/blog/html5-boilerplate-addon
@@ -142,24 +195,6 @@ TODO: Opengraph meta data to make things look nice when finished
         $('a[href^="http://"], a[href^="https://"]').not('a[href^="http://' + thisSite + '"], a[href^="https://' + thisSite + '"]').attr('target', '_blank');
 
     </script>
-    <script>
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date();
-            a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-        ga('create', 'UA-20916585-7', 'auto');
-        ga('send', 'pageview');
-
-    </script>
-
 </body>
 
 </html>

@@ -62,11 +62,15 @@ h1, h2{
     font-size: 1.6vw;
 }
 h2{
-    font-size: 1.25vw;
+    font-size: 1.0vw;
+}
+h3{
+    margin: 0 0 .4vw 0;
 }
 .contents .left,
 .contents .right {
     font-size: .85vw;
+    overflow-y: auto;
 }
 p {
     margin: 0 0 .5vw 0;
@@ -383,6 +387,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     display: block;
     color: #FFFFFF;
     z-index: 3;
+    overflow: auto;
 }
 .tv-menu .left,
 .tv-menu .right {
@@ -414,13 +419,14 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
 }
 .shows{
     display: flex;
-    flex-direction: column;
-    height: 10.5vw;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /*flex-direction: column;*/
+    /*height: 7.3vw;*/
+    /*overflow-y: auto;*/
+    overflow-y: hidden;
+    /*overflow-x: hidden;*/
 }
 .zoom .shows{
-    height: calc(10.5vw * var(--scale-ratio));
+    /*height: calc(10.5vw * var(--scale-ratio));*/
 }
 .shows li, .zoom .shows li{
     padding: 0;
@@ -468,7 +474,7 @@ html[data-useragent*=Firefox] .menu-overlay #video::before {
     flex-grow: 0;
 }
 .zoom .shows .video-info{
-    max-width: calc(13.1vw * var(--scale-ratio))
+    /*max-width: calc(13.1vw * var(--scale-ratio))*/
 }
 .shows .video-title{
     font-size: 1vw;

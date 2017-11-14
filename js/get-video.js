@@ -1,4 +1,20 @@
+//Adding support to different subredits
+var tx_subs = ["/r/InterdimensionalCable", "/r/NotTimAndEric", "/r/ACIDS", "/r/fifthworldvideos","/r/IllBeYourGuide", "/r/CommercialCuts"];
+var len_subs = tx_subs.length;
+var MAX_REQ = 50; //Max number of links will be requested each JSON call
+var PROB = 14; //Probability of accepting link (percentage)
+var min_score = 1; //Minimum score for reddit posts
 
+var min_score_slider = document.getElementById("min_score"); //Slider for minimum reddit score
+var min_score_output = document.getElementById("score_preview"); //Output for minimum reddit score
+
+// Update the min score & output whenever slider value changes
+min_score_slider.oninput = function() {
+    min_score_output.innerHTML = this.value;
+    min_score = this.value;
+} 
+
+//Begining of original code
 if (!Array.prototype.randomElement) {
 	Array.prototype.randomElement = function () {
 		return this[Math.floor(Math.random() * this.length)];
@@ -30,9 +46,88 @@ $(function () {
 		var youtube_video_regex = new RegExp(/(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/);
 
 		var videos = [], played = [];
+		
+		var probability_filter = function() {
+			var trial = 100*Math.random();
+			return trial <= PROB;	
+		}
 
-		var get_api_call = function (time, sort) {
-			return `https://www.reddit.com/r/InterdimensionalCable/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&limit=50`;
+		var get_api_call = function (time, sort, page, random_page) {
+			var cb_subs = new Array(len_subs);
+			cb_subs[0] = document.getElementById("IDC"); // Interdimensional Cable
+			cb_subs[1] = document.getElementById("NTE"); // Not Tim and Eric
+			cb_subs[2] = document.getElementById("ACI"); // ACIDS
+			cb_subs[3] = document.getElementById("FWV"); // Fifth World Videos
+                        cb_subs[4] = document.getElementById("IBG"); // I'll Be Your Guide
+                        cb_subs[5] = document.getElementById("CMC"); // Commercial Cuts
+			
+			var final_url;
+			var exist_checked = false;
+			for (i = 0; i < len_subs; i++) {
+				exist_checked = exist_checked || cb_subs[i].checked
+			}
+			if (exist_checked){
+				do {
+					var random_sub = Math.floor(len_subs * Math.random());
+				} while (cb_subs[random_sub].checked == false);
+				
+				tx_message = "Checkeados:\n";
+				for (i = 0; i < len_subs; i++) {
+					if ( cb_subs[i].checked == true )
+						tx_message += " · " + tx_subs[i] + "\n";
+				}
+			}else{
+				// if non option is 
+				// checked, use /r/InterdimensionalCable
+				// by default
+				var random_sub = 0;
+			}
+			var prefix = `https://www.reddit.com`+tx_subs[random_sub];
+			var suffix = ``;
+			if (random_page){
+				var use_randomrising = [true,false].randomElement();
+				if (!use_randomrising){
+					var random_post_data;
+					var is_ready = false;
+					var new_url;
+					$.getJSON(prefix+`/random.json`,function (api_response) {
+						api_response[0].data.children.forEach(function (child) {
+							random_post_data = child.data;
+							suffix = `?after=`+ random_post_data.name;
+							new_url = `https://www.reddit.com`+tx_subs[random_sub]+`/`+page+`.json`+suffix+`&limit=`+(MAX_REQ-1);
+							is_ready = true;
+							if(probability_filter()){
+								if (add_youtube_url(child.data)) {
+									console.log("Added " + child.data.url);
+								} else {
+									console.log("Ignored " + child.data.url);
+								}
+							}
+						});
+						$.getJSON(new_url, function (api_response) {
+							api_response.data.children.forEach(function (child) {
+								if(probability_filter()){
+									if (add_youtube_url(child.data)) {
+										console.log("Added " + child.data.url);
+									} else {
+										console.log("Ignored " + child.data.url);
+									}
+								}
+							});
+						}).fail(function () {
+							// Re-Poll on timeout/parse failure
+							setTimeout(load_videos, 5000);
+						});
+					});
+					return "nada"
+				}else{
+					return "https://www.reddit.com"+tx_subs[random_sub]+"/randomrising.json?limit="+(MAX_REQ);
+				}
+			}else{
+				return `https://www.reddit.com`+tx_subs[random_sub]+`/search.json?q=site%3Ayoutube.com+OR+site%3Ayoutu.be&restrict_sr=on&sort=${sort}&t=${time}&show="all"&limit=`+MAX_REQ+suffix;
+			}
+			
+			return null;
 		};
 
 		var add_youtube_url = function (reddit_post_data) {
@@ -45,9 +140,9 @@ $(function () {
 			if (reddit_post_data.url.indexOf("t=") != -1) {
 				return false;
 			}
-			// Check if a reddit post has less than 25 points.
+			// Check if a reddit post has less than 1 points.
 			// If the post does, ignore it. It is unworthy.
-			if (reddit_post_data.score < 5) {
+			if (reddit_post_data.score < min_score) {
 				return false;
 			}
 			var groups = youtube_video_regex.exec(reddit_post_data.url);
@@ -69,29 +164,36 @@ $(function () {
 		var load_posts = function () {
 			var time = ["week", "month", "year", "all"].randomElement();
 			var sort = ["relevance", "hot", "top", "new", "comments"].randomElement();
-			var url = get_api_call(time, sort);
-			$.getJSON(url, function (api_response) {
-				api_response.data.children.forEach(function (child) {
-					if (add_youtube_url(child.data)) {
-						console.log("Added " + child.data.url);
-					} else {
-						console.log("Ignored " + child.data.url);
-					}
+			var page = ["hot", "top", "new"].randomElement();
+			var random_page = [true,false].randomElement();
+			var url = get_api_call(time, sort, page, random_page);
+			if (url != "nada") {//Dirty awful hack
+				$.getJSON(url, function (api_response) {
+					api_response.data.children.forEach(function (child) {
+						if(probability_filter()){
+							if (add_youtube_url(child.data)) {
+								console.log("Added " + child.data.url);
+							} else {
+								console.log("Ignored " + child.data.url);
+							}
+						}
+					});
+				}).fail(function () {
+					// Re-Poll on timeout/parse failure
+					setTimeout(load_videos, 5000);
 				});
-			}).fail(function () {
-				// Re-Poll on timeout/parse failure
-				setTimeout(load_videos, 5000);
-			});
+			}//Else: see inside get_api_call()
 		};
 
 		load_posts();
 
 		var get_next_post = function () {
-			// We ran out of videos
-			// Reddit is likely off
-			if (videos.length == 0) {
-				return null;
-			}
+			// Removing this exception, now if length is zero, try again AND again.
+				// We ran out of videos
+				// Reddit is likely off
+				//if (videos.length == 0) {
+				//	return null;
+				//}
 			// We need to cache more videos
 			if (videos.length < 5) {
 				load_posts();
@@ -252,7 +354,7 @@ $(function () {
 	};
 
 	var channel_manager = function (player, get_next_video, play_clip) {
-		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "💵", "💰", "7", "A113", "8", "AMMEL", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "🍆", "20", "30", "40", "50", "60", "69", "70", "80", "90", "100", "/co/", "C132", "35C", "J19ζ7"];
+		var channel_names = ["1", "2", "TWO", "3", "4", "42", "1337", "5", "6", "117", "💵", "💰", "7", "A113", "8", "AMMEL", "9", "10", "🐐", "101", "C137", "👌😂", "🍌", "☭", "🍆", "20", "30", "40", "50", "60", "69", "80", "90", "100", "/co/", "C132", "35C", "J19ζ7"];
 		var quotes = ["sexsells", "imporv", "relax", "billmurray", "movie"];
 
 		var handle_quote = function () {
@@ -333,7 +435,13 @@ $(function () {
 		};
 
 		var on_ready = function (event) {
-			let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+			// Changing this line because I need to run this in legacy machines
+			//let [toggle_mute, volume_up, volume_down, play_clip] = volume_controller(player);
+			var volume_controller_return = volume_controller(player);
+			var toggle_mute = volume_controller_return[0]
+			var volume_up = volume_controller_return[1]
+			var volume_down = volume_controller_return[2]
+			var play_clip = volume_controller_return[3]
 
 			// Volume control
 			$("#mute").on("click", animate_callback(toggle_mute));

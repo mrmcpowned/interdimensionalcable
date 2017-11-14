@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+var tx_subs = ["/r/InterdimensionalCable", "/r/NotTimAndEric", "/r/ACIDS", "/r/fifthworldvideos"];
+var len_subs = tx_subs.length;
+</script>
+<h2>Checkboxes</h2>
+<form action="">
+<input type="checkbox" id="IDC">/r/InterdimensionalCable<br>
+<input type="checkbox" id="NTE">/r/NotTimAndEric<br>
+<input type="checkbox" id="ACI">/r/ACIDS<br>
+<input type="checkbox" id="FWV">/r/fifthworldvideos<br>
+</form>
+
+<h2>JavaScript Alert</h2>
+<button onclick="myFunction()">Try it</button>
+
+<script>
+function myFunction() {
+	var cb_subs = new Array(4);
+	cb_subs[0] = document.getElementById("IDC");
+    cb_subs[1] = document.getElementById("NTE");
+    cb_subs[2] = document.getElementById("ACI");
+	cb_subs[3] = document.getElementById("FWV");
+    tx_message = "Checkeados:\n";
+    for (i = 0; i < len_subs; i++) {
+        if ( cb_subs[i].checked == true )
+        	tx_message += " · " + tx_subs[i] + "\n";
+    }
+    alert(tx_message);
+}
+</script>
+
+</body>
+</html>
