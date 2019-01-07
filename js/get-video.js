@@ -302,7 +302,7 @@ $(function () {
 			var videoInfo = player.getVideoData();
 			var videoUrl = player.getVideoUrl();
 
-			var imgUrl = `http://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
+			var imgUrl = `https://img.youtube.com/vi/${videoInfo.video_id}/mqdefault.jpg`;
 
 			var listNode = $("#list-template li").clone();
 
